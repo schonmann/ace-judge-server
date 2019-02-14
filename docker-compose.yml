@@ -1,20 +1,12 @@
 version: '3'
 services:
-  web:
-    build: .
-    command: npm run dev
-    volumes:
-      - ./src:/usr/app/
-      - /usr/app/node_modules
+  ace-judge-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - 8080:8080
     depends_on:
-      - mysql
-    environment:
-      DATABASE_URL: mysql://ace@mysql/ace
-  mysql:
-    image: wangxian/alpine-mysql
-    environment:
-      MYSQL_DATABASE: ace
-      MYSQL_USER: ace
-      MYSQL_PASSWORD: ace
+      - ace-judge-database
+  ace-judge-database:
+    image: mysql

@@ -1,7 +1,9 @@
-FROM node:10.10.0-alpine
-WORKDIR /usr/app
+FROM java:8
 
-COPY package.json .
-RUN npm install --quiet
+VOLUME /tmp
 
-COPY ./src .
+EXPOSE 8080
+
+ADD target/ace-judge-server-0.0.1-SNAPSHOT.jar ace-judge-server-0.0.1-SNAPSHOT.jar
+
+ENTRYPOINT ["java", "-jar", "ace-judge-server-0.0.1-SNAPSHOT.jar"]
