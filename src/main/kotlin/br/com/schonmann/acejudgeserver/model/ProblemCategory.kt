@@ -1,6 +1,5 @@
 package br.com.schonmann.acejudgeserver.model
 
-import org.springframework.data.annotation.Id
 import javax.persistence.*
 
 @Entity
