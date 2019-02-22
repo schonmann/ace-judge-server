@@ -1,4 +1,4 @@
-package br.com.schonmann.acejudgeserver.core.` security`
+package br.com.schonmann.acejudgeserver.core.security
 
 import br.com.schonmann.acejudgeserver.core.auth.RestAuthenticationEntryPoint
 import br.com.schonmann.acejudgeserver.core.auth.handler.FailureHandler
@@ -12,11 +12,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.web.filter.CorsFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-
+import java.util.*
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 @Configuration
 @EnableWebSecurity
@@ -61,7 +62,12 @@ class SecurityJavaConfig @Autowired constructor(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", CorsConfiguration().applyPermitDefaultValues())
+        val cors = CorsConfiguration().applyPermitDefaultValues();
+        cors.allowCredentials = true
+        cors.allowedMethods = Stream.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH").collect(Collectors.toList())
+        cors.allowedHeaders = Stream.of("Authorization", "Cache-Control", "Content-Type").collect(Collectors.toList())
+        cors.allowedOrigins = Stream.of("*").collect(Collectors.toList())
+        source.registerCorsConfiguration("/**", cors)
         return source
     }
 }
