@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-
 @Component
 class RestAuthenticationEntryPoint : AuthenticationEntryPoint {
     override fun commence(request: HttpServletRequest?, response: HttpServletResponse?, authException: org.springframework.security.core.AuthenticationException?) {
-        response!!.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+        response!!.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                "Unauthorized")
     }
 }

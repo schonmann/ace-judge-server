@@ -1,4 +1,4 @@
-package br.com.schonmann.acejudgeserver.model.enum
+package br.com.schonmann.acejudgeserver.enum
 
 enum class ProblemVisibilityEnum(val visibility : Int) {
     PUBLIC(0),

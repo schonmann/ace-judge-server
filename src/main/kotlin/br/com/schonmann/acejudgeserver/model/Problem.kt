@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.model
 
-import br.com.schonmann.acejudgeserver.model.enum.ProblemVisibilityEnum
+import br.com.schonmann.acejudgeserver.enum.ProblemVisibilityEnum
 import javax.persistence.*
 
 

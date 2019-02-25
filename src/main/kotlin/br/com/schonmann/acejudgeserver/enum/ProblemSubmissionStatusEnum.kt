@@ -1,4 +1,4 @@
-package br.com.schonmann.acejudgeserver.model.enum
+package br.com.schonmann.acejudgeserver.enum
 
 enum class ProblemSubmissionStatusEnum(val status : Int) {
     JUDGE_QUEUE(0),
