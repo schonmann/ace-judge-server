@@ -6,9 +6,15 @@ import javax.persistence.*
 
 @Entity
 class Problem(
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) var id: Long,
-    var name: String,
-    var description: String,
-    var visibility: ProblemVisibilityEnum,
-    @ManyToOne var category: ProblemCategory
+        @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        var id: Long = 0,
+
+        var name: String,
+
+        var description: String,
+
+        var visibility: ProblemVisibilityEnum,
+
+        @ManyToOne
+        var category: ProblemCategory
 )

@@ -4,7 +4,11 @@ import javax.persistence.*
 
 @Entity
 class ProblemCategory(
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE) var id: Long,
-    var name: String,
-    @Lob var image: String
+        @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        var id: Long = 0,
+        
+        var name: String,
+
+        @Lob
+        var image: String
 )

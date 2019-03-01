@@ -5,9 +5,17 @@ import javax.persistence.*
 
 @Entity
 class ProblemSubmission(
-        @Id @GeneratedValue(strategy = GenerationType.AUTO) val id : Long,
-        @ManyToOne val problem : Problem,
-        @ManyToOne val user : User,
-        @Lob val solutionProgram : String,
+        @Id @GeneratedValue(strategy = GenerationType.AUTO)
+        val id : Long = 0,
+
+        @ManyToOne
+        val problem : Problem,
+
+        @ManyToOne
+        val user : User,
+
+        @Lob
+        val solutionProgram : String,
+
         val status : ProblemSubmissionStatusEnum
 )

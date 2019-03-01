@@ -17,7 +17,7 @@ class AuthService(@Autowired private val userService: UserService) : UserDetails
         if (username == null) {
             throw UsernameNotFoundException("username is null")
         }
-        val user : User? = userService.findByUsername(username)
+        val user: User? = userService.findByUsername(username)
         return user ?: throw UsernameNotFoundException("user not found in database")
     }
 }
