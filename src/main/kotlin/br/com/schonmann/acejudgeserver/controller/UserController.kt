@@ -21,16 +21,9 @@ class UserController(@Autowired private val userService: UserService) : BaseCont
     @PreAuthorize("hasAuthority('VIEW')")
     fun getUserData(): ResponseEntity<UserDTO> {
 
-        val authentication = SecurityContextHolder.getContext().authentication
-
-        for (x in authentication.authorities) {
-            println(x.authority)
-        }
-
         userService.findByUsername(this.getRequestUser().username)?.let {
             return ResponseEntity.ok(UserDTO(it))
         }
-
         return ResponseEntity.notFound().build()
     }
 }

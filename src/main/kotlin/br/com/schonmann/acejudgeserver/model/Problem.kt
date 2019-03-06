@@ -9,12 +9,16 @@ class Problem(
         @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
         var id: Long = 0,
 
+        @Column(nullable = false)
         var name: String,
 
+        @Column(nullable = false)
         var description: String,
 
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
         var visibility: ProblemVisibilityEnum,
 
-        @ManyToOne
+        @ManyToOne(optional = false)
         var category: ProblemCategory
 )

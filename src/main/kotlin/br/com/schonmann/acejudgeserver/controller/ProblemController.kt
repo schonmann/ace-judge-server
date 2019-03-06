@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/problem")
-class ProblemController {
+class ProblemController : BaseController {
 
     @GetMapping(value = ["/list"])
     fun list() {

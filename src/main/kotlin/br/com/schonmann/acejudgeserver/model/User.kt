@@ -34,7 +34,10 @@ class User(
         val roles: Collection<Role> = ArrayList(),
 
         @Transient
-        private val authorities: MutableCollection<out GrantedAuthority>? = ArrayList()
+        private val authorities: MutableCollection<out GrantedAuthority>? = ArrayList(),
+
+        @OneToMany(mappedBy = "user")
+        private val submissions : Collection<ProblemSubmission> = ArrayList()
 
 ) : UserDetails {
 
