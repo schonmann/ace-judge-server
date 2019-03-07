@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.model
 
-import br.com.schonmann.acejudgeserver.enum.ProblemCategoryEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import javax.persistence.*
 
 @Entity

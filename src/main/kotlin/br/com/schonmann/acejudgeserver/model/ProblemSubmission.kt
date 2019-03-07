@@ -1,6 +1,7 @@
 package br.com.schonmann.acejudgeserver.model
 
-import br.com.schonmann.acejudgeserver.enum.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -23,5 +24,12 @@ class ProblemSubmission(
         val status : ProblemSubmissionStatusEnum,
 
         @ManyToOne(optional = true)
-        val parentContest : Contest?
+        val parentContest : Contest?,
+
+        val submitDate: Date,
+
+        val startDate: Date?,
+
+        val endDate : Date?
+
 )

@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.service
 
-import br.com.schonmann.acejudgeserver.enum.RoleEnum
+import br.com.schonmann.acejudgeserver.enums.RoleEnum
 import br.com.schonmann.acejudgeserver.model.User
 import br.com.schonmann.acejudgeserver.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired

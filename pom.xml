@@ -69,6 +69,24 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-apt</artifactId>
+			<version>${querydsl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-jpa</artifactId>
+			<version>${querydsl.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -91,6 +109,35 @@
 						<plugin>jpa</plugin>
 					</compilerPlugins>
 				</configuration>
+
+				<executions>
+					<execution>
+						<id>compile</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>kapt</id>
+						<goals>
+							<goal>kapt</goal>
+						</goals>
+						<configuration>
+							<sourceDirs>
+								<sourceDir>src/main/kotlin</sourceDir>
+							</sourceDirs>
+							<annotationProcessorPaths>
+								<annotationProcessorPath>
+									<groupId>com.querydsl</groupId>
+									<artifactId>querydsl-apt</artifactId>
+									<version>${querydsl.version}</version>
+									<classifier>jpa</classifier>
+								</annotationProcessorPath>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+				</executions>
 				<dependencies>
 					<dependency>
 						<groupId>org.jetbrains.kotlin</groupId>

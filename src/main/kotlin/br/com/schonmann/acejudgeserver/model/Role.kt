@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.model
 
-import br.com.schonmann.acejudgeserver.enum.RoleEnum
+import br.com.schonmann.acejudgeserver.enums.RoleEnum
 import javax.persistence.*
 
 @Entity

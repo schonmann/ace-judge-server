@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.repository
 
-import br.com.schonmann.acejudgeserver.enum.ProblemCategoryEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import br.com.schonmann.acejudgeserver.model.ProblemCategory
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository

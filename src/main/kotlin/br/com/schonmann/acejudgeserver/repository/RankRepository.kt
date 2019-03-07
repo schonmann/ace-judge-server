@@ -14,7 +14,7 @@ interface RankRepository : JpaRepository<User, Long> {
 
     @Transactional
     @Query("select new br.com.schonmann.acejudgeserver.dto.RankDTO(0L, u.name, count(s)) " +
-            "from User u left join u.submissions s left join s.problem p where s.status = br.com.schonmann.acejudgeserver.enum.ProblemSubmissionStatusEnum.CORRECT_ANSWER and p.visibility = br.com.schonmann.acejudgeserver.enum.ProblemVisibilityEnum.PUBLIC group by u order by count(s) desc")
+            "from User u left join u.submissions s left join s.problem p where s.status = br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum.CORRECT_ANSWER and p.visibility = br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum.PUBLIC group by u order by count(s) desc")
     fun getGeneralRank(pageable: Pageable): Page<RankDTO>
 
 }

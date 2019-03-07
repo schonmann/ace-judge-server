@@ -1,4 +1,4 @@
-package br.com.schonmann.acejudgeserver.enum
+package br.com.schonmann.acejudgeserver.enums
 
 /**
  * RoleEnum contains all app roles.

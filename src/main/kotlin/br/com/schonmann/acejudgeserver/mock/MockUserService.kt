@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.mock
 
-import br.com.schonmann.acejudgeserver.enum.RoleEnum
+import br.com.schonmann.acejudgeserver.enums.RoleEnum
 import br.com.schonmann.acejudgeserver.service.RoleService
 import br.com.schonmann.acejudgeserver.service.UserService
 import org.springframework.beans.factory.annotation.Autowired

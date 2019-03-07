@@ -1,8 +1,8 @@
 package br.com.schonmann.acejudgeserver.init
 
-import br.com.schonmann.acejudgeserver.enum.PrivilegeEnum
-import br.com.schonmann.acejudgeserver.enum.ProblemCategoryEnum
-import br.com.schonmann.acejudgeserver.enum.RoleEnum
+import br.com.schonmann.acejudgeserver.enums.PrivilegeEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
+import br.com.schonmann.acejudgeserver.enums.RoleEnum
 import br.com.schonmann.acejudgeserver.mock.MockUserService
 import br.com.schonmann.acejudgeserver.model.Privilege
 import br.com.schonmann.acejudgeserver.model.ProblemCategory
@@ -10,7 +10,6 @@ import br.com.schonmann.acejudgeserver.model.Role
 import br.com.schonmann.acejudgeserver.service.PrivilegeService
 import br.com.schonmann.acejudgeserver.service.ProblemCategoryService
 import br.com.schonmann.acejudgeserver.service.RoleService
-import br.com.schonmann.acejudgeserver.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent

@@ -1,4 +1,4 @@
-package br.com.schonmann.acejudgeserver.enum
+package br.com.schonmann.acejudgeserver.enums
 
 enum class PrivilegeEnum(val privilege : Int) {
     ALL(0),

@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.service
 
-import br.com.schonmann.acejudgeserver.enum.RoleEnum
+import br.com.schonmann.acejudgeserver.enums.RoleEnum
 import br.com.schonmann.acejudgeserver.model.Privilege
 import br.com.schonmann.acejudgeserver.model.Role
 import br.com.schonmann.acejudgeserver.repository.RoleRepository

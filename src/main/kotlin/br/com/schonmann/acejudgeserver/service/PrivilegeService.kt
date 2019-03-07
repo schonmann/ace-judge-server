@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.service
 
-import br.com.schonmann.acejudgeserver.enum.PrivilegeEnum
+import br.com.schonmann.acejudgeserver.enums.PrivilegeEnum
 import br.com.schonmann.acejudgeserver.model.Privilege
 import br.com.schonmann.acejudgeserver.repository.PrivilegeRepository
 import org.springframework.beans.factory.annotation.Autowired

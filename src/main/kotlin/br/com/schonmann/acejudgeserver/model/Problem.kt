@@ -1,10 +1,12 @@
 package br.com.schonmann.acejudgeserver.model
 
-import br.com.schonmann.acejudgeserver.enum.ProblemVisibilityEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemDifficultyEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
+import com.querydsl.core.annotations.QueryEntity
 import javax.persistence.*
 
-
 @Entity
+@QueryEntity
 class Problem(
         @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
         var id: Long = 0,
@@ -20,5 +22,9 @@ class Problem(
         var visibility: ProblemVisibilityEnum,
 
         @ManyToOne(optional = false)
-        var category: ProblemCategory
+        var category: ProblemCategory,
+
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        var difficulty : ProblemDifficultyEnum
 )

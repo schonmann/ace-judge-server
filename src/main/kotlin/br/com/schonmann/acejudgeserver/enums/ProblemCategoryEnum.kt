@@ -1,4 +1,4 @@
-package br.com.schonmann.acejudgeserver.enum
+package br.com.schonmann.acejudgeserver.enums
 
 enum class ProblemCategoryEnum(val privilege : Int) {
     DYNAMIC_PROGRAMMING(0),
