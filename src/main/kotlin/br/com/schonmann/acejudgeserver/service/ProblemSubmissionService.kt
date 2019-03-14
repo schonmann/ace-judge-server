@@ -10,12 +10,14 @@ import br.com.schonmann.acejudgeserver.repository.ContestRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemSubmissionRepository
 import br.com.schonmann.acejudgeserver.repository.UserRepository
+import br.com.schonmann.acejudgeserver.storage.StorageException
 import br.com.schonmann.acejudgeserver.storage.StorageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
@@ -35,7 +37,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         return Page.empty()
     }
 
-    @Transactional
+    @Transactional(rollbackFor = [ StorageException::class, Exception::class ])
     fun submitSolution(username: String, problemId : Long, contestId: Long?, timestamp : Long, file : MultipartFile) {
         val contest : Contest? =  if (contestId != null) contestRepository.findByIdOrNull(contestId) else null
         val problem = problemRepository.getOne(problemId)
@@ -46,5 +48,6 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 queueStartDate = null, queueEndDate = null))
 
         storageService.store(file, problemSubmission.id.toString())
+        TODO("Verificar porque nunca dá rollback ao jogar StorageException :(")
     }
 }

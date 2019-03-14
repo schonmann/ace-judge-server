@@ -32,7 +32,6 @@ class ProblemSubmissionController(@Autowired private val problemSubmissionServic
 
     @PostMapping("/submit", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @PreAuthorize("hasAuthority('VIEW')")
-    @Transactional
     fun handleFileUpload(@RequestParam("file") solutionFile: MultipartFile, @RequestParam problemId : Long,
                          @RequestParam contestId : Long?, @RequestParam timestamp : Long) {
         problemSubmissionService.submitSolution(getRequestUser().username, problemId, contestId, timestamp, solutionFile)

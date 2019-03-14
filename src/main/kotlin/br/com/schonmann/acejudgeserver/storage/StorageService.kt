@@ -10,6 +10,7 @@ interface StorageService {
 
     fun init()
 
+    @Throws(StorageException::class)
     fun store(file: MultipartFile, renameTo: String? = null)
 
     fun loadAll(): Stream<Path>

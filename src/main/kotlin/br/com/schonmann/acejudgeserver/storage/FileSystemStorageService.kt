@@ -21,6 +21,7 @@ class FileSystemStorageService constructor(@Autowired private val storagePropert
 
     private val rootLocation: Path = Paths.get(storageProperties.location)
 
+    @Throws(StorageException::class)
     override fun store(file: MultipartFile, renameTo : String?) {
         val extension = StringUtils.getFilenameExtension(file.originalFilename!!)
         val filename = if (renameTo != null) "$renameTo.$extension" else StringUtils.cleanPath(file.originalFilename!!)
