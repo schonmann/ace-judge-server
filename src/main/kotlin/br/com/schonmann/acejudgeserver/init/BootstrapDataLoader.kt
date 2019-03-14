@@ -59,8 +59,16 @@ class BootstrapDataLoader(
             return
         }
 
-        createRoleIfNotFound(role = RoleEnum.ROLE_ADMIN, privileges = listOf(PrivilegeEnum.ALL))
-        createRoleIfNotFound(role = RoleEnum.ROLE_USER, privileges = listOf(PrivilegeEnum.VIEW, PrivilegeEnum.PROBLEM_SUBMIT, PrivilegeEnum.PROBLEM_VIEW))
+        createRoleIfNotFound(role = RoleEnum.ROLE_ADMIN, privileges = listOf(
+                PrivilegeEnum.ALL,
+                PrivilegeEnum.PROBLEM_CRUD,
+                PrivilegeEnum.CONTEST_CRUD,
+                PrivilegeEnum.USER_CRUD
+        ))
+        createRoleIfNotFound(role = RoleEnum.ROLE_USER, privileges = listOf(
+                PrivilegeEnum.VIEW,
+                PrivilegeEnum.PROBLEM_SUBMIT,
+                PrivilegeEnum.PROBLEM_VIEW))
 
         createProblemCategoryIfNotFound(category = ProblemCategoryEnum.AD_HOC, image = "https://picsum.photos/200")
         createProblemCategoryIfNotFound(category = ProblemCategoryEnum.COMPUTATIONAL_GEOMETRY, image = "https://picsum.photos/200")

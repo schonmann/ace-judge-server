@@ -19,6 +19,9 @@ class UserService(@Autowired private val userRepository: UserRepository, private
 
     @Transactional
     fun createUser(username: String, password: String, name: String, address: String, pictureUrl: String, roles: Collection<RoleEnum>) {
+        if(userRepository.existsByUsername(username)) {
+            return
+        }
         if (!roles.contains(defaultRole)) {
             roles.plus(defaultRole)
         }

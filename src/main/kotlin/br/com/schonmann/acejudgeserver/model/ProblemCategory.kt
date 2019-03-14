@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 class ProblemCategory(
-        @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long = 0,
 
         @Enumerated(EnumType.STRING)

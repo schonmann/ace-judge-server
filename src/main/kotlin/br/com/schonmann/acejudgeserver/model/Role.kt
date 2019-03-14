@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 class Role(
-        @Id @GeneratedValue(strategy = GenerationType.AUTO)
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long = 0,
 
         @Enumerated(value = EnumType.STRING) @Column(nullable = false)

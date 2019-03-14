@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 class ProblemSubmission(
-        @Id @GeneratedValue(strategy = GenerationType.AUTO)
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id : Long = 0,
 
         @ManyToOne(optional = false)
@@ -14,10 +14,6 @@ class ProblemSubmission(
 
         @ManyToOne(optional = false)
         val user : User,
-
-        @Lob
-        @Column(nullable = false)
-        val solutionProgram : String,
 
         @Enumerated(value = EnumType.STRING)
         @Column(nullable = false)
@@ -28,8 +24,8 @@ class ProblemSubmission(
 
         val submitDate: Date,
 
-        val startDate: Date?,
+        val queueStartDate: Date?,
 
-        val endDate : Date?
+        val queueEndDate: Date?
 
 )

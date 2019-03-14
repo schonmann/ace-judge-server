@@ -3,11 +3,9 @@ package br.com.schonmann.acejudgeserver.dto
 import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemDifficultyEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
-import br.com.schonmann.acejudgeserver.model.Problem
-import br.com.schonmann.acejudgeserver.model.ProblemCategory
 
-data class ProblemDTO(
-    val id: Long,
+data class ProblemSaveDTO(
+    val id: Long?,
     val name: String,
     val problemDescription: String,
     val constraintDescription: String,
@@ -16,6 +14,4 @@ data class ProblemDTO(
     val category: ProblemCategoryEnum,
     val difficulty: ProblemDifficultyEnum,
     val visibility: ProblemVisibilityEnum
-) {
-    constructor(p : Problem) : this(p.id, p.name, p.problemDescription, p.constraintDescription, p.exampleInput, p.exampleOutput, p.category.category, p.difficulty, p.visibility)
-}
+)

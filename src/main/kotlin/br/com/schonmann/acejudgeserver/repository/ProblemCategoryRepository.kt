@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ProblemCategoryRepository : JpaRepository<ProblemCategory, Long> {
     fun findByCategory(category: ProblemCategoryEnum) : ProblemCategory?
+    fun findOneByCategory(category: ProblemCategoryEnum) : ProblemCategory
 }

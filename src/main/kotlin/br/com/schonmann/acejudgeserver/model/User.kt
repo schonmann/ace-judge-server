@@ -12,32 +12,32 @@ import javax.persistence.*
 
 @Entity
 class User(
-        @Id @GeneratedValue(strategy = GenerationType.AUTO)
-        val id: Long = 0,
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
 
-        private val username: String,
-        private val password: String,
-        val name: String,
-        val address: String,
-        val pictureUrl: String = "",
+    private val username: String,
+    private val password: String,
+    val name: String,
+    val address: String,
+    val pictureUrl: String = "",
 
-        @Column(name = "enabled", nullable = false)
-        val enabled: Boolean = true,
+    @Column(name = "enabled", nullable = false)
+    val enabled: Boolean = true,
 
-        @ManyToMany(fetch = FetchType.EAGER)
-        @JoinTable(
-            name = "users_roles",
-            joinColumns = [JoinColumn(
-                    name = "user_id", referencedColumnName = "id")],
-            inverseJoinColumns = [JoinColumn(
-                    name = "role_id", referencedColumnName = "id")])
-        val roles: Collection<Role> = ArrayList(),
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "users_roles",
+        joinColumns = [JoinColumn(
+                name = "user_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(
+                name = "role_id", referencedColumnName = "id")])
+    val roles: Collection<Role> = ArrayList(),
 
-        @Transient
-        private val authorities: MutableCollection<out GrantedAuthority>? = ArrayList(),
+    @Transient
+    private val authorities: MutableCollection<out GrantedAuthority>? = ArrayList(),
 
-        @OneToMany(mappedBy = "user")
-        private val submissions : Collection<ProblemSubmission> = ArrayList()
+    @OneToMany(mappedBy = "user")
+    private val submissions : Collection<ProblemSubmission> = ArrayList()
 
 ) : UserDetails {
 

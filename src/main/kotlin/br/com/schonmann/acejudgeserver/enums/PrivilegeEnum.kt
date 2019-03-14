@@ -6,5 +6,6 @@ enum class PrivilegeEnum(val privilege : Int) {
     PROBLEM_CRUD(2),
     CONTEST_CRUD(3),
     PROBLEM_SUBMIT(4),
-    PROBLEM_VIEW(5)
+    PROBLEM_VIEW(5),
+    USER_CRUD(6)
 }

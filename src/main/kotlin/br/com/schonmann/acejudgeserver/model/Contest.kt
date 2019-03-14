@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 class Contest(
-        @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long = 0,
 
         var name: String,
