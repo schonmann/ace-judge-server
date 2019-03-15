@@ -1,9 +1,11 @@
 package br.com.schonmann.acejudgeserver.service
 
+import br.com.schonmann.acejudgeserver.dto.ProblemStatisticsDTO
 import br.com.schonmann.acejudgeserver.dto.RankDTO
 import br.com.schonmann.acejudgeserver.dto.SolutionDTO
 import br.com.schonmann.acejudgeserver.dto.SubmitSolutionDTO
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
 import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.ProblemSubmission
 import br.com.schonmann.acejudgeserver.repository.ContestRepository
@@ -48,6 +50,16 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 queueStartDate = null, queueEndDate = null))
 
         storageService.store(file, problemSubmission.id.toString())
-        TODO("Verificar porque nunca dá rollback ao jogar StorageException :(")
+        //TODO: "Verificar porque nunca dá rollback ao jogar StorageException :("
+    }
+
+    fun getSubmissionStatistics() : ProblemStatisticsDTO {
+
+        val numSolved = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(ProblemVisibilityEnum.PUBLIC,
+                listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER))
+        val numErrored = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(ProblemVisibilityEnum.PUBLIC,
+                listOf(ProblemSubmissionStatusEnum.WRONG_ANSWER, ProblemSubmissionStatusEnum.COMPILE_ERROR, ProblemSubmissionStatusEnum.RUNTIME_ERROR))
+
+        return ProblemStatisticsDTO(numSolved ?: 0, numErrored ?: 0)
     }
 }

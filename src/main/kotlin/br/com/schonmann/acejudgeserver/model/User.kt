@@ -33,6 +33,10 @@ class User(
                 name = "role_id", referencedColumnName = "id")])
     val roles: Collection<Role> = ArrayList(),
 
+
+    @ManyToMany(mappedBy = "participants")
+    var contests : List<Contest> = ArrayList(),
+
     @Transient
     private val authorities: MutableCollection<out GrantedAuthority>? = ArrayList(),
 

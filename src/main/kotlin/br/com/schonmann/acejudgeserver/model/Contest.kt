@@ -1,7 +1,10 @@
 package br.com.schonmann.acejudgeserver.model
 
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.util.*
 import javax.persistence.*
+import kotlin.collections.ArrayList
 
 
 @Entity
@@ -11,11 +14,21 @@ class Contest(
 
         var name: String,
 
+        var password: String,
+
         var description: String,
 
-        var startTime: Date,
+        var startDate: Date,
 
-        var endTime: Date,
+        var endDate: Date,
+
+        @ManyToMany(fetch = FetchType.EAGER)
+        @JoinTable(
+                name = "contests_users",
+                joinColumns = [JoinColumn(name = "contest_id", referencedColumnName = "id")],
+                inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
+        @Fetch(value = FetchMode.SUBSELECT)
+        var participants: Collection<User> = ArrayList(),
 
         @ManyToOne
         var admin: User

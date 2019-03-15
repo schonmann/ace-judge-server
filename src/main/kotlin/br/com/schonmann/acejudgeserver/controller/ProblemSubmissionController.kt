@@ -1,5 +1,6 @@
 package br.com.schonmann.acejudgeserver.controller
 
+import br.com.schonmann.acejudgeserver.dto.ProblemStatisticsDTO
 import br.com.schonmann.acejudgeserver.dto.ProblemSubmissionDTO
 import br.com.schonmann.acejudgeserver.service.ProblemSubmissionService
 import org.jetbrains.annotations.NotNull
@@ -35,5 +36,12 @@ class ProblemSubmissionController(@Autowired private val problemSubmissionServic
     fun handleFileUpload(@RequestParam("file") solutionFile: MultipartFile, @RequestParam problemId : Long,
                          @RequestParam contestId : Long?, @RequestParam timestamp : Long) {
         problemSubmissionService.submitSolution(getRequestUser().username, problemId, contestId, timestamp, solutionFile)
+    }
+
+    @GetMapping("/statistics", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PreAuthorize("hasAuthority('VIEW')")
+    @Transactional
+    fun getSubmissionStatistics(): ProblemStatisticsDTO {
+        return problemSubmissionService.getSubmissionStatistics()
     }
 }
