@@ -43,7 +43,7 @@ class ContestService(@Autowired private val contestRepository: ContestRepository
 
         val contest = Contest(c.id ?: 0 , c.name, c.password, c.description, c.startDate.sumTimeString(c.startTime), c.endDate.sumTimeString(c.endTime), ArrayList(), user)
 
-        contestRepository.findByIdOrNull(c.id)?.let { dbContest ->
+        contestRepository.findByIdOrNull(c.id ?: 0)?.let { dbContest ->
             // Keep original references from database.
             contest.admin = dbContest.admin
             contest.participants = dbContest.participants
