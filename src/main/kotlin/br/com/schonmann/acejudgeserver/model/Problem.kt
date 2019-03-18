@@ -28,6 +28,8 @@ class Problem(
         @Column(nullable = false, length = 16777215)
         var exampleOutput: String,
 
+        @ManyToMany(mappedBy = "problems")
+        var contests : List<Contest> = ArrayList(),
 
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)

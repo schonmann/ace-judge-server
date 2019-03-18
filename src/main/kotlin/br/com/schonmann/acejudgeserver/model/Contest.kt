@@ -32,6 +32,15 @@ class Contest(
         @Fetch(value = FetchMode.SUBSELECT)
         var participants: List<User> = ArrayList(),
 
+        @ManyToMany(fetch = FetchType.EAGER)
+        @JoinTable(
+                name = "contests_problems",
+                joinColumns = [JoinColumn(name = "contest_id", referencedColumnName = "id")],
+                inverseJoinColumns = [JoinColumn(name = "problem_id", referencedColumnName = "id")])
+        @Fetch(value = FetchMode.SUBSELECT)
+        var problems: List<Problem> = ArrayList(),
+
         @ManyToOne
         var admin: User
+
 )

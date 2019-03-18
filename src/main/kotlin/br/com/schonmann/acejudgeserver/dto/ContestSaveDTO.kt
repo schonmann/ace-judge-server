@@ -10,5 +10,6 @@ data class ContestSaveDTO (
         val startDate: Date,
         val startTime: String,
         val endDate: Date,
-        val endTime: String
+        val endTime: String,
+        val problemsIds: List<Long>
 )

@@ -19,4 +19,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ProblemRepository : JpaRepository<Problem, Long>, QuerydslPredicateExecutor<Problem> {
     fun findByNameContaining(pageable: Pageable, name: String): Page<Problem>
+    fun findByIdIn(ids : List<Long>): List<Problem>
 }

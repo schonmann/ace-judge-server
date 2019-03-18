@@ -4,8 +4,10 @@ import br.com.schonmann.acejudgeserver.dto.ContestSaveDTO
 import br.com.schonmann.acejudgeserver.dto.SelectDTO
 import br.com.schonmann.acejudgeserver.exception.ForbiddenException
 import br.com.schonmann.acejudgeserver.model.Contest
+import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.model.User
 import br.com.schonmann.acejudgeserver.repository.ContestRepository
+import br.com.schonmann.acejudgeserver.repository.ProblemRepository
 import br.com.schonmann.acejudgeserver.repository.UserRepository
 import br.com.schonmann.acejudgeserver.util.sumTimeString
 import com.querydsl.core.types.Predicate
@@ -19,7 +21,7 @@ import java.util.*
 
 @Service
 class ContestService(@Autowired private val contestRepository: ContestRepository,
-                     private val userRepository: UserRepository) {
+                     private val userRepository: UserRepository, private val problemRepository: ProblemRepository) {
 
     fun getByFilter(predicate: Predicate, pageable: Pageable): Page<Contest> {
         return contestRepository.findAll(predicate, pageable)
@@ -41,7 +43,10 @@ class ContestService(@Autowired private val contestRepository: ContestRepository
 
         val user : User = userRepository.getOneByUsername(username)
 
-        val contest = Contest(c.id ?: 0 , c.name, c.password, c.description, c.startDate.sumTimeString(c.startTime), c.endDate.sumTimeString(c.endTime), ArrayList(), user)
+        val problems : List<Problem> = problemRepository.findByIdIn(c.problemsIds)
+
+        val contest = Contest(c.id ?: 0 , c.name, c.password, c.description,
+                c.startDate.sumTimeString(c.startTime), c.endDate.sumTimeString(c.endTime), ArrayList(), problems, user)
 
         contestRepository.findByIdOrNull(c.id ?: 0)?.let { dbContest ->
             // Keep original references from database.

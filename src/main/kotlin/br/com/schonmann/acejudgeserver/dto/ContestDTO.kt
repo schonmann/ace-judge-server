@@ -13,10 +13,11 @@ data class ContestDTO (
         val startTime: String,
         val endDate: Date,
         val endTime: String,
-        val admin : String
+        val admin : String,
+        val problems : List<ProblemDTO>
 ) {
     constructor(c : Contest) : this(c.id, c.name,c.description, c.participants.size.toLong(),
             c.startDate, c.startDate.toString("HH:mm"),
             c.endDate, c.endDate.toString("HH:mm"),
-            c.admin.name)
+            c.admin.name, c.problems.map { x -> ProblemDTO(x) })
 }
