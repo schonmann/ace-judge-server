@@ -1,8 +1,12 @@
 package br.com.schonmann.acejudgeserver.repository
 
+import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.Problem
+import br.com.schonmann.acejudgeserver.model.QContest
 import br.com.schonmann.acejudgeserver.model.QProblem
 import com.querydsl.core.types.dsl.StringPath
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer
@@ -14,4 +18,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ProblemRepository : JpaRepository<Problem, Long>, QuerydslPredicateExecutor<Problem> {
+    fun findByNameContaining(pageable: Pageable, name: String): Page<Problem>
 }

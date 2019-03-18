@@ -29,6 +29,10 @@ class ProblemService(@Autowired private val problemRepository: ProblemRepository
         return problemRepository.getOne(id)
     }
 
+    fun getByNameContaining(pageable: Pageable, name : String) : Page<Problem> {
+        return problemRepository.findByNameContaining(pageable, name)
+    }
+
     fun save(problemSaveDTO: ProblemSaveDTO) {
 
         val category = problemCategoryRepository.findOneByCategory(problemSaveDTO.category)

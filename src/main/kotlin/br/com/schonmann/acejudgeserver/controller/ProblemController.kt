@@ -3,6 +3,7 @@ package br.com.schonmann.acejudgeserver.controller
 import br.com.schonmann.acejudgeserver.dto.ProblemDTO
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
 import br.com.schonmann.acejudgeserver.dto.RankDTO
+import br.com.schonmann.acejudgeserver.dto.SelectDTO
 import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.repository.ProblemRepository
 import br.com.schonmann.acejudgeserver.service.ProblemService
@@ -42,5 +43,11 @@ class ProblemController(@Autowired private val problemService : ProblemService) 
     fun getById(@RequestParam("id") id : Long): ResponseEntity<ProblemDTO> {
         val problem = problemService.getById(id)
         return ResponseEntity.ok(ProblemDTO(problem))
+    }
+
+    @GetMapping("/queryByName", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PreAuthorize("hasAuthority('VIEW')")
+    fun queryByName(pageable: Pageable, @RequestParam name : String): Page<SelectDTO> {
+        return problemService.getByNameContaining(pageable, name).map { x -> SelectDTO(x.id, x.name) }
     }
 }

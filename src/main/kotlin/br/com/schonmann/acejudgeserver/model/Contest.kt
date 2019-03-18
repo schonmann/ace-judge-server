@@ -16,6 +16,8 @@ class Contest(
 
         var password: String,
 
+        @Lob
+        @Column(nullable = false, length = 16777215)
         var description: String,
 
         var startDate: Date,
@@ -28,7 +30,7 @@ class Contest(
                 joinColumns = [JoinColumn(name = "contest_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
         @Fetch(value = FetchMode.SUBSELECT)
-        var participants: Collection<User> = ArrayList(),
+        var participants: List<User> = ArrayList(),
 
         @ManyToOne
         var admin: User
