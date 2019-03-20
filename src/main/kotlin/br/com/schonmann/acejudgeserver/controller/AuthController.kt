@@ -6,6 +6,7 @@ import br.com.schonmann.acejudgeserver.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(@Autowired private val userService: UserService) : BaseController {
 
     @PostMapping("/signup", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-    fun signup(dto : SignupDTO) {
+    fun signup(@RequestBody dto : SignupDTO) {
         var roles = listOf(RoleEnum.ROLE_USER)
         if (dto.privilegeKey == "superace") {//TODO: undo this when you can :)
             roles = roles.plus(RoleEnum.ROLE_ADMIN)

@@ -12,6 +12,7 @@ class Contest(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long = 0,
 
+        @Column(nullable = false)
         var name: String,
 
         var password: String,
@@ -40,7 +41,6 @@ class Contest(
         @Fetch(value = FetchMode.SUBSELECT)
         var problems: List<Problem> = ArrayList(),
 
-        @ManyToOne
+        @ManyToOne(optional = false)
         var admin: User
-
 )

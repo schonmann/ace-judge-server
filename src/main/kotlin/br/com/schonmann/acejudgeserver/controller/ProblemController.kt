@@ -7,7 +7,9 @@ import br.com.schonmann.acejudgeserver.dto.SelectDTO
 import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.repository.ProblemRepository
 import br.com.schonmann.acejudgeserver.service.ProblemService
+import com.querydsl.core.types.Ops
 import com.querydsl.core.types.Predicate
+import com.querydsl.core.types.dsl.Expressions
 import org.jetbrains.annotations.NotNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page

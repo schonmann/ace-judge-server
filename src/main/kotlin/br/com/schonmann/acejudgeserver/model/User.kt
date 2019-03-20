@@ -15,10 +15,18 @@ class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
+    @Column(unique = true, nullable = false)
     private val username: String,
+
+    @Column(nullable = false)
     private val password: String,
+
+    @Column(nullable = false)
     val name: String,
+
+    @Column(nullable = false)
     val address: String,
+
     val pictureUrl: String = "",
 
     @Column(name = "enabled", nullable = false)

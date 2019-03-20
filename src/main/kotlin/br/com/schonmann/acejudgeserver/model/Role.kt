@@ -8,7 +8,8 @@ class Role(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long = 0,
 
-        @Enumerated(value = EnumType.STRING) @Column(nullable = false)
+        @Enumerated(value = EnumType.STRING)
+        @Column(nullable = false, unique = true)
         var role: RoleEnum,
 
         @ManyToMany(mappedBy = "roles")
