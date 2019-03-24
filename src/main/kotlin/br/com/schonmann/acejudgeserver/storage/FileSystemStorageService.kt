@@ -22,9 +22,9 @@ class FileSystemStorageService constructor(@Autowired private val storagePropert
     private val rootLocation: Path = Paths.get(storageProperties.location)
 
     @Throws(StorageException::class)
-    override fun store(file: MultipartFile, renameTo : String?) {
-        val extension = StringUtils.getFilenameExtension(file.originalFilename!!)
-        val filename = if (renameTo != null) "$renameTo.$extension" else StringUtils.cleanPath(file.originalFilename!!)
+    override fun store(file: MultipartFile, renameTo : String?, ignoreExtension : Boolean) {
+        val extension = if (ignoreExtension) "" else ".${StringUtils.getFilenameExtension(file.originalFilename!!)}"
+        val filename = if (renameTo != null) "$renameTo$extension" else StringUtils.cleanPath(file.originalFilename!!)
         try {
             if (file.isEmpty) {
                 throw StorageException("Failed to store empty file $filename")
@@ -35,6 +35,7 @@ class FileSystemStorageService constructor(@Autowired private val storagePropert
                         "Cannot store file with relative path outside current directory $filename")
             }
             file.inputStream.use { inputStream ->
+                Files.createDirectories(this.rootLocation.resolve(filename).parent)
                 Files.copy(inputStream, this.rootLocation.resolve(filename),
                         StandardCopyOption.REPLACE_EXISTING)
             }

@@ -9,7 +9,7 @@ class ProblemCategory(
         var id: Long = 0,
 
         @Enumerated(EnumType.STRING)
-        @Column(nullable = false, unique = true)
+        @Column(nullable = false, unique = true, length = 25)
         var category: ProblemCategoryEnum,
 
         @Lob

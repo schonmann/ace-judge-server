@@ -5,6 +5,7 @@ import br.com.schonmann.acejudgeserver.enums.ProblemDifficultyEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
 import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.model.ProblemCategory
+import org.springframework.web.multipart.MultipartFile
 
 data class ProblemDTO(
     val id: Long,

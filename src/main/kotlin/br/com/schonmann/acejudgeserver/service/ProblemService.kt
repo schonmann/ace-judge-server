@@ -1,54 +1,24 @@
 package br.com.schonmann.acejudgeserver.service
 
-import br.com.schonmann.acejudgeserver.dto.ProblemDTO
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
-import br.com.schonmann.acejudgeserver.dto.RankDTO
 import br.com.schonmann.acejudgeserver.model.Problem
-import br.com.schonmann.acejudgeserver.model.ProblemCategory
 import br.com.schonmann.acejudgeserver.repository.ProblemCategoryRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemRepository
+import br.com.schonmann.acejudgeserver.storage.StorageException
+import br.com.schonmann.acejudgeserver.storage.StorageService
 import com.querydsl.core.types.Predicate
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-@Service
-class ProblemService(@Autowired private val problemRepository: ProblemRepository, @Autowired private val problemCategoryRepository: ProblemCategoryRepository) {
-
-    fun getByFilter(predicate: Predicate, pageable: Pageable): Page<Problem> {
-        return problemRepository.findAll(predicate, pageable)
-    }
-
-    fun getByFilter(pageable: Pageable): Page<Problem> {
-        return problemRepository.findAll(pageable)
-    }
-
-    fun getById(id : Long) : Problem {
-        return problemRepository.getOne(id)
-    }
-
-    fun getByNameContaining(pageable: Pageable, name : String) : Page<Problem> {
-        return problemRepository.findByNameContaining(pageable, name)
-    }
-
-    fun save(problemSaveDTO: ProblemSaveDTO) {
-
-        val category = problemCategoryRepository.findOneByCategory(problemSaveDTO.category)
-
-        val problem = Problem(
-            id = problemSaveDTO.id ?: 0,
-            category = category,
-            name = problemSaveDTO.name,
-            problemDescription = problemSaveDTO.problemDescription,
-            constraintDescription = problemSaveDTO.constraintDescription,
-            difficulty = problemSaveDTO.difficulty,
-            exampleInput = problemSaveDTO.exampleInput,
-            exampleOutput = problemSaveDTO.exampleOutput,
-            visibility = problemSaveDTO.visibility
-        )
-
-        problemRepository.save(problem)
-    }
+interface ProblemService {
+    fun getByFilter(predicate: Predicate, pageable: Pageable): Page<Problem>
+    fun getByFilter(pageable: Pageable): Page<Problem>
+    fun getById(id : Long) : Problem
+    fun getByNameContaining(pageable: Pageable, name : String) : Page<Problem>
+    fun save(dto: ProblemSaveDTO)
 }

@@ -9,7 +9,7 @@ class Role(
         var id: Long = 0,
 
         @Enumerated(value = EnumType.STRING)
-        @Column(nullable = false, unique = true)
+        @Column(nullable = false, unique = true, length = 25)
         var role: RoleEnum,
 
         @ManyToMany(mappedBy = "roles")

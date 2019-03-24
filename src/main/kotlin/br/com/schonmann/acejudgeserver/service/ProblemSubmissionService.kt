@@ -2,8 +2,6 @@ package br.com.schonmann.acejudgeserver.service
 
 import br.com.schonmann.acejudgeserver.dto.ProblemStatisticsDTO
 import br.com.schonmann.acejudgeserver.dto.RankDTO
-import br.com.schonmann.acejudgeserver.dto.SolutionDTO
-import br.com.schonmann.acejudgeserver.dto.SubmitSolutionDTO
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
 import br.com.schonmann.acejudgeserver.model.Contest
@@ -14,12 +12,13 @@ import br.com.schonmann.acejudgeserver.repository.ProblemSubmissionRepository
 import br.com.schonmann.acejudgeserver.repository.UserRepository
 import br.com.schonmann.acejudgeserver.storage.StorageException
 import br.com.schonmann.acejudgeserver.storage.StorageService
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
@@ -29,7 +28,11 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
    private val problemRepository: ProblemRepository,
    private val contestRepository: ContestRepository,
    private val userRepository: UserRepository,
-   private val storageService: StorageService) {
+   private val storageService: StorageService,
+   private val rabbitTemplate: RabbitTemplate) {
+
+    @Value("\${ace.queues.submission.queue}")
+    private lateinit var queueName : String
 
     fun getMySubmissions(username : String, pageable: Pageable): Page<ProblemSubmission> {
         return problemSubmissionRepository.findByUserUsername(username, pageable)
@@ -39,7 +42,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         return Page.empty()
     }
 
-    @Transactional(rollbackFor = [ StorageException::class, Exception::class ])
+    @Transactional
     fun submitSolution(username: String, problemId : Long, contestId: Long?, timestamp : Long, file : MultipartFile) {
         val contest : Contest? =  if (contestId != null) contestRepository.findByIdOrNull(contestId) else null
         val problem = problemRepository.getOne(problemId)
@@ -47,10 +50,23 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
 
         val problemSubmission = problemSubmissionRepository.save(ProblemSubmission(problem = problem, user = user,
                 parentContest = contest, submitDate = Date(timestamp), status = ProblemSubmissionStatusEnum.JUDGE_QUEUE,
-                queueStartDate = null, queueEndDate = null))
+                judgeStartDate = null, judgeEndDate = null))
 
         storageService.store(file, problemSubmission.id.toString())
+        rabbitTemplate.convertAndSend(queueName, problemSubmission.id.toString())
+
         //TODO: "Verificar porque nunca dá rollback ao jogar StorageException :("
+    }
+
+    @Transactional
+    fun judgeSolution(submissionId : Long) {
+
+        val problemSubmission : ProblemSubmission = problemSubmissionRepository.getOne(submissionId)
+
+        problemSubmission.status = ProblemSubmissionStatusEnum.CORRECT_ANSWER
+        problemSubmission.judgeEndDate = Date()
+
+        problemSubmissionRepository.save(problemSubmission)
     }
 
     fun getSubmissionStatistics() : ProblemStatisticsDTO {

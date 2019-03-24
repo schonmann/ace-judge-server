@@ -4,6 +4,7 @@ import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
 import br.com.schonmann.acejudgeserver.model.ProblemCategory
 import br.com.schonmann.acejudgeserver.model.ProblemSubmission
+import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 data class ProblemSubmissionDTO(

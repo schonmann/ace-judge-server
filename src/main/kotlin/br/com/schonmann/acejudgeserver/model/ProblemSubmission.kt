@@ -17,15 +17,15 @@ class ProblemSubmission(
 
         @Enumerated(value = EnumType.STRING)
         @Column(nullable = false)
-        val status : ProblemSubmissionStatusEnum,
+        var status : ProblemSubmissionStatusEnum,
 
         @ManyToOne(optional = true)
         val parentContest : Contest?,
 
-        val submitDate: Date,
+        var submitDate: Date,
 
-        val queueStartDate: Date?,
+        var judgeStartDate: Date?,
 
-        val queueEndDate: Date?
+        var judgeEndDate: Date?
 
 )
