@@ -21,6 +21,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import java.nio.file.Path
 import java.util.*
 
 @Service
@@ -35,7 +36,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     private lateinit var queueName : String
 
     fun getMySubmissions(username : String, pageable: Pageable): Page<ProblemSubmission> {
-        return problemSubmissionRepository.findByUserUsername(username, pageable)
+        return problemSubmissionRepository.findByUserUsernameOrderByIdDesc(username, pageable)
     }
 
     fun getRankByContest(pageable: Pageable): Page<RankDTO> {
@@ -61,20 +62,30 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     @Transactional
     fun judgeSolution(submissionId : Long) {
 
-        val problemSubmission : ProblemSubmission = problemSubmissionRepository.getOne(submissionId)
+        val submission : ProblemSubmission = problemSubmissionRepository.getOne(submissionId)
 
-        problemSubmission.status = ProblemSubmissionStatusEnum.CORRECT_ANSWER
-        problemSubmission.judgeEndDate = Date()
+        val solution: Path = storageService.load(submission.id.toString())
+        val judgeInput: Path = storageService.load("problems/${submission.id}/in")
+        val judgeOutput: Path = storageService.load("problems/${submission.id}/out")
 
-        problemSubmissionRepository.save(problemSubmission)
+
+
+        submission.status = ProblemSubmissionStatusEnum.CORRECT_ANSWER
+        submission.judgeStartDate = Date()
+        submission.judgeEndDate = Date()
+
+        problemSubmissionRepository.save(submission)
     }
 
-    fun getSubmissionStatistics() : ProblemStatisticsDTO {
+    fun getSubmissionStatistics(username : String) : ProblemStatisticsDTO {
 
-        val numSolved = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(ProblemVisibilityEnum.PUBLIC,
-                listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER))
-        val numErrored = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(ProblemVisibilityEnum.PUBLIC,
-                listOf(ProblemSubmissionStatusEnum.WRONG_ANSWER, ProblemSubmissionStatusEnum.COMPILE_ERROR, ProblemSubmissionStatusEnum.RUNTIME_ERROR))
+        val user = userRepository.getOneByUsername(username)
+
+        val numSolved = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
+            listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER))
+
+        val numErrored = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
+            listOf(ProblemSubmissionStatusEnum.WRONG_ANSWER, ProblemSubmissionStatusEnum.COMPILE_ERROR, ProblemSubmissionStatusEnum.RUNTIME_ERROR))
 
         return ProblemStatisticsDTO(numSolved ?: 0, numErrored ?: 0)
     }

@@ -42,6 +42,6 @@ class ProblemSubmissionController(@Autowired private val problemSubmissionServic
     @PreAuthorize("hasAuthority('VIEW')")
     @Transactional
     fun getSubmissionStatistics(): ProblemStatisticsDTO {
-        return problemSubmissionService.getSubmissionStatistics()
+        return problemSubmissionService.getSubmissionStatistics(getRequestUser().username)
     }
 }
