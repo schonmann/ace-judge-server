@@ -68,8 +68,6 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         val judgeInput: Path = storageService.load("problems/${submission.id}/in")
         val judgeOutput: Path = storageService.load("problems/${submission.id}/out")
 
-
-
         submission.status = ProblemSubmissionStatusEnum.CORRECT_ANSWER
         submission.judgeStartDate = Date()
         submission.judgeEndDate = Date()
