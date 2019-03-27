@@ -7,5 +7,6 @@ enum class ProblemSubmissionStatusEnum(val status : Int) {
     WRONG_COMPLEXITY(2),
     RUNTIME_ERROR(3),
     COMPILE_ERROR(4),
-    IN_EXECUTION(5)
+    IN_EXECUTION(5),
+    TIME_LIMIT_EXCEEDED(6)
 }

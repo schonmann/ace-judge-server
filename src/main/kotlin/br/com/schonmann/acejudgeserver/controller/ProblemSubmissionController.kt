@@ -2,7 +2,10 @@ package br.com.schonmann.acejudgeserver.controller
 
 import br.com.schonmann.acejudgeserver.dto.ProblemStatisticsDTO
 import br.com.schonmann.acejudgeserver.dto.ProblemSubmissionDTO
+import br.com.schonmann.acejudgeserver.dto.SubmitSolutionDTO
 import br.com.schonmann.acejudgeserver.service.ProblemSubmissionService
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.jetbrains.annotations.NotNull
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +23,7 @@ import java.nio.charset.Charset
 
 @RestController
 @RequestMapping("/api/problem-submission")
-class ProblemSubmissionController(@Autowired private val problemSubmissionService: ProblemSubmissionService) : BaseController {
+class ProblemSubmissionController(@Autowired private val problemSubmissionService: ProblemSubmissionService, private val objectMapper: ObjectMapper) : BaseController {
 
     val logger = LoggerFactory.getLogger(this::class.simpleName)
 
@@ -33,9 +36,13 @@ class ProblemSubmissionController(@Autowired private val problemSubmissionServic
 
     @PostMapping("/submit", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @PreAuthorize("hasAuthority('VIEW')")
-    fun handleFileUpload(@RequestParam("file") solutionFile: MultipartFile, @RequestParam problemId : Long,
-                         @RequestParam contestId : Long?, @RequestParam timestamp : Long) {
-        problemSubmissionService.submitSolution(getRequestUser().username, problemId, contestId, timestamp, solutionFile)
+    fun submitProblem(@RequestParam("file") solutionFile: MultipartFile, @RequestParam params : String) {
+
+        val dto : SubmitSolutionDTO = objectMapper.readValue(params)
+
+        dto.solutionFile = solutionFile
+
+        problemSubmissionService.submitSolution(getRequestUser().username, dto)
     }
 
     @GetMapping("/statistics", produces = [MediaType.APPLICATION_JSON_VALUE])

@@ -1,5 +1,6 @@
 package br.com.schonmann.acejudgeserver.dto
 
+import br.com.schonmann.acejudgeserver.enums.LanguageEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
 import br.com.schonmann.acejudgeserver.model.ProblemCategory
@@ -15,8 +16,9 @@ data class ProblemSubmissionDTO(
     val problemId : Long,
     val problemName: String,
     val submitDate : Date?,
-    val executionTime : Double
+    val executionTime : Double,
+    val language : LanguageEnum
 ) {
     constructor(ps : ProblemSubmission) : this(ps.id, ps.status, ps.problem.category.category, ps.parentContest?.name, ps.problem.id, ps.problem.name, ps.submitDate,
-            0.000 )//TODO: parametrizar
+            0.000 , ps.language)//TODO: parametrizar
 }
