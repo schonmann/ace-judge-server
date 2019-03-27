@@ -2,6 +2,8 @@ package br.com.schonmann.acejudgeserver.repository
 
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
+import br.com.schonmann.acejudgeserver.model.Contest
+import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.model.ProblemSubmission
 import br.com.schonmann.acejudgeserver.model.User
 import org.springframework.data.domain.Page
@@ -17,5 +19,7 @@ interface ProblemSubmissionRepository : JpaRepository<ProblemSubmission, Long> {
 
     @Query("select count(distinct p) from ProblemSubmission ps inner join ps.user u inner join ps.problem p where p.visibility = :visibility and ps.status in (:status) and u = :user group by p")
     fun countByVisibilityAndStatusInGroupByProblem(user : User, visibility: ProblemVisibilityEnum, status : Collection<ProblemSubmissionStatusEnum>) : Long?
+
+    fun existsByUserAndProblemAndStatusAndParentContest(user : User, problem : Problem, status : ProblemSubmissionStatusEnum, parentContest: Contest?) : Boolean
 
 }

@@ -23,4 +23,5 @@ interface ProblemService {
     fun getById(id : Long) : Problem
     fun getByNameContaining(pageable: Pageable, name : String) : Page<Problem>
     fun save(dto: ProblemSaveDTO)
+    fun isProblemSolved(problem: Problem, username : String, contestId: Long? = null) : Boolean
 }

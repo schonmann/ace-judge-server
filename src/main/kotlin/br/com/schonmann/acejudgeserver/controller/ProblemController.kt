@@ -22,19 +22,25 @@ import org.springframework.web.multipart.MultipartFile
 @RequestMapping("/api/problem")
 class ProblemController(@Autowired private val problemService : ProblemService, private val objectMapper: ObjectMapper) : BaseController {
 
+    fun problemDtoWithSolvedFlag(problem : Problem) : ProblemDTO {
+        val dto = ProblemDTO(problem)
+        dto.solved = problemService.isProblemSolved(problem, getRequestUser().username)
+        return dto
+    }
+
     @GetMapping("/query", produces = [MediaType.APPLICATION_JSON_VALUE])
     @PreAuthorize("hasAuthority('VIEW')")
     fun getByFilter(pageable: Pageable, @QuerydslPredicate(root = Problem::class) predicate : Predicate?): Page<ProblemDTO> {
         if (predicate != null) {
-            return problemService.getByFilter(predicate, pageable).map { x -> ProblemDTO(x) }
+            return problemService.getByFilter(predicate, pageable).map { p -> problemDtoWithSolvedFlag(p) }
         }
-        return problemService.getByFilter(pageable).map { x -> ProblemDTO(x) }
+        return problemService.getByFilter(pageable).map { p -> problemDtoWithSolvedFlag(p) }
     }
 
     @GetMapping("/queryByContest", produces = [MediaType.APPLICATION_JSON_VALUE])
     @PreAuthorize("hasAuthority('VIEW')")
     fun getByContest(pageable: Pageable, @RequestParam contestId: Long): Page<ProblemDTO> {
-        return problemService.getByContestsContaining(pageable, contestId).map { x -> ProblemDTO(x) }
+        return problemService.getByContestsContaining(pageable, contestId).map { p -> problemDtoWithSolvedFlag(p) }
     }
 
     @PostMapping("/save", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])

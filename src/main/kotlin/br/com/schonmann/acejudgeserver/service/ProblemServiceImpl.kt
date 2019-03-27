@@ -1,10 +1,11 @@
 package br.com.schonmann.acejudgeserver.service
 
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.Problem
-import br.com.schonmann.acejudgeserver.repository.ContestRepository
-import br.com.schonmann.acejudgeserver.repository.ProblemCategoryRepository
-import br.com.schonmann.acejudgeserver.repository.ProblemRepository
+import br.com.schonmann.acejudgeserver.model.User
+import br.com.schonmann.acejudgeserver.repository.*
 import br.com.schonmann.acejudgeserver.storage.StorageException
 import br.com.schonmann.acejudgeserver.storage.StorageService
 import com.querydsl.core.types.Predicate
@@ -13,11 +14,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ProblemServiceImpl(@Autowired private val problemRepository: ProblemRepository, private val problemCategoryRepository: ProblemCategoryRepository, private val storageService: StorageService, private val contestRepository: ContestRepository) : ProblemService {
+class ProblemServiceImpl(@Autowired private val problemRepository: ProblemRepository, private val userRepository: UserRepository, private val problemCategoryRepository: ProblemCategoryRepository, private val storageService: StorageService, private val contestRepository: ContestRepository, private val problemSubmissionRepository: ProblemSubmissionRepository) : ProblemService {
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -31,6 +33,16 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
 
     override fun getByContestsContaining(pageable: Pageable, contestId: Long): Page<Problem> {
         return problemRepository.findByContest(pageable, contestId)
+    }
+
+    override fun isProblemSolved(problem: Problem, username: String, contestId: Long?): Boolean {
+
+        val contest : Contest? = if (contestId != null) contestRepository.findByIdOrNull(contestId) else null
+        val user : User = userRepository.getOneByUsername(username)
+
+        val statusCorrectAnswer = ProblemSubmissionStatusEnum.CORRECT_ANSWER
+
+        return problemSubmissionRepository.existsByUserAndProblemAndStatusAndParentContest(user, problem, statusCorrectAnswer, contest)
     }
 
     override fun getById(id: Long): Problem {

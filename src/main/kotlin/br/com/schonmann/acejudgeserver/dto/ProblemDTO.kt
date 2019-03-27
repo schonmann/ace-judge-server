@@ -16,7 +16,8 @@ data class ProblemDTO(
     val exampleOutput: String,
     val category: ProblemCategoryEnum,
     val difficulty: ProblemDifficultyEnum,
-    val visibility: ProblemVisibilityEnum
+    val visibility: ProblemVisibilityEnum,
+    var solved: Boolean
 ) {
-    constructor(p : Problem) : this(p.id, p.name, p.problemDescription, p.constraintDescription, p.exampleInput, p.exampleOutput, p.category.category, p.difficulty, p.visibility)
+    constructor(p : Problem) : this(p.id, p.name, p.problemDescription, p.constraintDescription, p.exampleInput, p.exampleOutput, p.category.category, p.difficulty, p.visibility, false)
 }
