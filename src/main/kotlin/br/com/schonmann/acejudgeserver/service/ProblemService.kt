@@ -1,6 +1,7 @@
 package br.com.schonmann.acejudgeserver.service
 
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
+import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.repository.ProblemCategoryRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemRepository
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 interface ProblemService {
     fun getByFilter(predicate: Predicate, pageable: Pageable): Page<Problem>
     fun getByFilter(pageable: Pageable): Page<Problem>
+    fun getByContestsContaining(pageable: Pageable, contestId: Long): Page<Problem>
     fun getById(id : Long) : Problem
     fun getByNameContaining(pageable: Pageable, name : String) : Page<Problem>
     fun save(dto: ProblemSaveDTO)

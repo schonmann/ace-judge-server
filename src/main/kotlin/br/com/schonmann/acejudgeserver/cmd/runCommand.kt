@@ -19,7 +19,7 @@ fun String.runCommand(workingDir: File, time: Long = 3, timeUnit: TimeUnit = Tim
     val output = proc.inputStream.bufferedReader().readText()
     if (proc.exitValue() != 0) {
         proc.destroyForcibly()
-        throw ExecutionException("error executing program, code = ${proc.exitValue()}")
+        throw ExecutionException("error executing program, code = ${proc.exitValue()}, message = $output")
     }
     proc.destroyForcibly()
     return output

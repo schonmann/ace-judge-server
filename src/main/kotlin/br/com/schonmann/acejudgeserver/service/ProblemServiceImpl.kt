@@ -2,6 +2,7 @@ package br.com.schonmann.acejudgeserver.service
 
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
 import br.com.schonmann.acejudgeserver.model.Problem
+import br.com.schonmann.acejudgeserver.repository.ContestRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemCategoryRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemRepository
 import br.com.schonmann.acejudgeserver.storage.StorageException
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ProblemServiceImpl(@Autowired private val problemRepository: ProblemRepository, private val problemCategoryRepository: ProblemCategoryRepository, private val storageService: StorageService) : ProblemService {
+class ProblemServiceImpl(@Autowired private val problemRepository: ProblemRepository, private val problemCategoryRepository: ProblemCategoryRepository, private val storageService: StorageService, private val contestRepository: ContestRepository) : ProblemService {
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -26,6 +27,10 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
 
     override fun getByFilter(pageable: Pageable): Page<Problem> {
         return problemRepository.findAll(pageable)
+    }
+
+    override fun getByContestsContaining(pageable: Pageable, contestId: Long): Page<Problem> {
+        return problemRepository.findByContest(pageable, contestId)
     }
 
     override fun getById(id: Long): Problem {

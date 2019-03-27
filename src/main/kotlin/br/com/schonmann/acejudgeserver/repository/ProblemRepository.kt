@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.StringPath
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer
 import org.springframework.data.querydsl.binding.QuerydslBindings
@@ -19,5 +20,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ProblemRepository : JpaRepository<Problem, Long>, QuerydslPredicateExecutor<Problem> {
     fun findByNameContaining(pageable: Pageable, name: String): Page<Problem>
+    @Query("select problem.* from problem inner join contests_problems on problem.id = contests_problems.problem_id where contests_problems.contest_id = :contestId", nativeQuery = true)
+    fun findByContest(pageable: Pageable, contestId: Long) : Page<Problem>
     fun findByIdIn(ids : List<Long>): List<Problem>
 }

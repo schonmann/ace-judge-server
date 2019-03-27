@@ -31,6 +31,12 @@ class ProblemController(@Autowired private val problemService : ProblemService, 
         return problemService.getByFilter(pageable).map { x -> ProblemDTO(x) }
     }
 
+    @GetMapping("/queryByContest", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PreAuthorize("hasAuthority('VIEW')")
+    fun getByContest(pageable: Pageable, @RequestParam contestId: Long): Page<ProblemDTO> {
+        return problemService.getByContestsContaining(pageable, contestId).map { x -> ProblemDTO(x) }
+    }
+
     @PostMapping("/save", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @PreAuthorize("hasAuthority('PROBLEM_CRUD')")
     fun save(@RequestParam judgeInput: MultipartFile?, @RequestParam judgeOutput: MultipartFile?, @RequestParam inputGeneratorFile: MultipartFile?, @RequestParam params : String) {
