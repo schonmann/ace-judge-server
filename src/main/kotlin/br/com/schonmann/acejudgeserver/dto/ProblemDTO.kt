@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile
 data class ProblemDTO(
     val id: Long,
     val name: String,
+    val score: Long,
     val problemDescription: String,
     val constraintDescription: String,
     val exampleInput: String,
@@ -19,5 +20,5 @@ data class ProblemDTO(
     val visibility: ProblemVisibilityEnum,
     var solved: Boolean
 ) {
-    constructor(p : Problem) : this(p.id, p.name, p.problemDescription, p.constraintDescription, p.exampleInput, p.exampleOutput, p.category.category, p.difficulty, p.visibility, false)
+    constructor(p : Problem) : this(p.id, p.name, p.score, p.problemDescription, p.constraintDescription, p.exampleInput, p.exampleOutput, p.category.category, p.difficulty, p.visibility, false)
 }

@@ -14,6 +14,9 @@ class Problem(
         @Column(nullable = false)
         var name: String,
 
+        @Column(nullable = false)
+        var score: Long,
+
         @Column(nullable = false, length = 16777215)
         @Lob
         var problemDescription: String, // hypertext!

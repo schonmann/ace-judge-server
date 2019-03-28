@@ -3,6 +3,9 @@ package br.com.schonmann.acejudgeserver.service
 import br.com.schonmann.acejudgeserver.dto.ProblemStatisticsDTO
 import br.com.schonmann.acejudgeserver.dto.RankDTO
 import br.com.schonmann.acejudgeserver.dto.SubmitSolutionDTO
+import br.com.schonmann.acejudgeserver.dto.ws.NotificationDTO
+import br.com.schonmann.acejudgeserver.enums.NotificationSubjectEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
 import br.com.schonmann.acejudgeserver.exception.ExecutionException
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.lang.Exception
@@ -29,12 +33,13 @@ import java.util.*
 
 @Service
 class ProblemSubmissionService(@Autowired private val problemSubmissionRepository: ProblemSubmissionRepository,
-                               private val problemRepository: ProblemRepository,
-                               private val contestRepository: ContestRepository,
-                               private val userRepository: UserRepository,
-                               private val storageService: StorageService,
-                               private val rabbitTemplate: RabbitTemplate,
-                               private val correctnessJudge: CorrectnessJudge) {
+       private val problemRepository: ProblemRepository,
+       private val contestRepository: ContestRepository,
+       private val userRepository: UserRepository,
+       private val storageService: StorageService,
+       private val rabbitTemplate: RabbitTemplate,
+       private val simpMessagingTemplate: SimpMessagingTemplate,
+       private val correctnessJudge: CorrectnessJudge) {
 
     @Value("\${ace.queues.submission.queue}")
     private lateinit var queueName: String
@@ -85,18 +90,27 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         submission.judgeEndDate = Date()
 
         problemSubmissionRepository.save(submission)
+
+        // notify user that his submission is complete! :)
+
+        val notificationDTO = NotificationDTO("A submissão para o problema '${submission.problem.name}' foi julgada: ${submission.status}", NotificationSubjectEnum.SUBMISSIONS)
+
+        simpMessagingTemplate.convertAndSend("/notifications/${submission.user.id}", notificationDTO)
     }
 
     fun getSubmissionStatistics(username: String): ProblemStatisticsDTO {
 
         val user = userRepository.getOneByUsername(username)
 
-        val numSolved = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
-                listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER))
+        val numSolved : Long = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
+                listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER)) ?: 0
+        val numErrored : Long = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
+                listOf(ProblemSubmissionStatusEnum.WRONG_ANSWER, ProblemSubmissionStatusEnum.COMPILE_ERROR, ProblemSubmissionStatusEnum.RUNTIME_ERROR)) ?: 0
 
-        val numErrored = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
-                listOf(ProblemSubmissionStatusEnum.WRONG_ANSWER, ProblemSubmissionStatusEnum.COMPILE_ERROR, ProblemSubmissionStatusEnum.RUNTIME_ERROR))
+        val numSolvedByCategory : Map<ProblemCategoryEnum, Long> = ProblemCategoryEnum.values().map { c ->
+            c to (problemSubmissionRepository.countProblemsSolvedByCategory(user, ProblemVisibilityEnum.PUBLIC, listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER), c) ?: 0)
+        }.toMap()
 
-        return ProblemStatisticsDTO(numSolved ?: 0, numErrored ?: 0)
+        return ProblemStatisticsDTO(numSolved, numErrored, numSolvedByCategory)
     }
 }
