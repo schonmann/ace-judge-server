@@ -3,7 +3,7 @@ package br.com.schonmann.acejudgeserver.service
 import br.com.schonmann.acejudgeserver.dto.ProblemStatisticsDTO
 import br.com.schonmann.acejudgeserver.dto.RankDTO
 import br.com.schonmann.acejudgeserver.dto.SubmitSolutionDTO
-import br.com.schonmann.acejudgeserver.dto.ws.NotificationDTO
+import br.com.schonmann.acejudgeserver.dto.ws.VerdictNotificationDTO
 import br.com.schonmann.acejudgeserver.enums.NotificationSubjectEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
@@ -27,7 +27,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.Exception
 import java.nio.file.Path
 import java.util.*
 
@@ -93,7 +92,10 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
 
         // notify user that his submission is complete! :)
 
-        val notificationDTO = NotificationDTO("A submissão para o problema '${submission.problem.name}' foi julgada: ${submission.status}", NotificationSubjectEnum.SUBMISSIONS)
+        val notificationDTO = VerdictNotificationDTO(
+                submissionId = submission.id,
+                verdict = submission.status,
+                subject = NotificationSubjectEnum.SUBMISSION_VERDICT)
 
         simpMessagingTemplate.convertAndSend("/notifications/${submission.user.id}", notificationDTO)
     }
