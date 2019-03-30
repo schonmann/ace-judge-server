@@ -16,9 +16,8 @@ data class ProblemSubmissionDTO(
     val problemId : Long,
     val problemName: String,
     val submitDate : Date?,
-    val executionTime : Double,
-    val language : LanguageEnum
+    val language : LanguageEnum,
+    val runtime : Double
 ) {
-    constructor(ps : ProblemSubmission) : this(ps.id, ps.status, ps.problem.category.category, ps.parentContest?.name, ps.problem.id, ps.problem.name, ps.submitDate,
-            0.000 , ps.language)//TODO: parametrizar
+    constructor(ps : ProblemSubmission) : this(ps.id, ps.status, ps.problem.category.category, ps.parentContest?.name, ps.problem.id, ps.problem.name, ps.submitDate, ps.language, ps.runtime ?: 0.000)//TODO: parametrizar
 }

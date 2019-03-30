@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Path
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 @Service
 class ProblemSubmissionService(@Autowired private val problemSubmissionRepository: ProblemSubmissionRepository,
@@ -59,7 +60,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
 
         val submission = problemSubmissionRepository.save(ProblemSubmission(problem = problem, user = user,
                 parentContest = contest, submitDate = Date(dto.timestamp), status = ProblemSubmissionStatusEnum.JUDGE_QUEUE,
-                judgeStartDate = null, judgeEndDate = null, language = dto.language))
+                runtime = null, language = dto.language))
 
         storageService.store(dto.solutionFile!!, "submissions/${submission.id}/solution")
         rabbitTemplate.convertAndSend(queueName, "${submission.id}")
@@ -76,17 +77,15 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         val judgeInput: Path = storageService.load("problems/$problemId/in")
         val judgeOutput: Path = storageService.load("problems/$problemId/out")
 
-        submission.judgeStartDate = Date()
-
         try {
-            submission.status = correctnessJudge.verdict(solution, language, judgeInput, judgeOutput)
+            val verdict = correctnessJudge.verdict(solution, language, judgeInput, judgeOutput)
+            submission.status = verdict.status
+            submission.runtime = verdict.runtime
         } catch (ee: ExecutionException) {
             submission.status = ProblemSubmissionStatusEnum.COMPILE_ERROR
         } catch (ee: TimeLimitException) {
             submission.status = ProblemSubmissionStatusEnum.TIME_LIMIT_EXCEEDED
         }
-
-        submission.judgeEndDate = Date()
 
         problemSubmissionRepository.save(submission)
 

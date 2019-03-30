@@ -29,8 +29,6 @@ class ProblemSubmission(
 
         var submitDate: Date,
 
-        var judgeStartDate: Date?,
-
-        var judgeEndDate: Date?
+        var runtime: Double?
 
 )
