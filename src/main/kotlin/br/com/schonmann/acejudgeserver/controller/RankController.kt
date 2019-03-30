@@ -10,6 +10,7 @@ import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 
@@ -21,5 +22,11 @@ class RankController(@Autowired private val rankService: RankService) : BaseCont
     @PreAuthorize("hasAuthority('VIEW')")
     fun getGeneralRank(@NotNull pageable: Pageable): Page<RankDTO> {
         return rankService.getGeneralRank(pageable)
+    }
+
+    @GetMapping("/contest", params = ["page", "size"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PreAuthorize("hasAuthority('VIEW')")
+    fun getContestRank(@NotNull pageable: Pageable, @RequestParam contestId : Long): Page<RankDTO> {
+        return rankService.getContestRank(pageable, contestId)
     }
 }

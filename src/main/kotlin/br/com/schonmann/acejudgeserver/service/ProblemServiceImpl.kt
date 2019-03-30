@@ -32,7 +32,7 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
     }
 
     override fun getByContestsContaining(pageable: Pageable, contestId: Long): Page<Problem> {
-        return problemRepository.findByContest(pageable, contestId)
+        return problemRepository.findByContestOrderByIdAsc(pageable, contestId)
     }
 
     override fun isProblemSolved(problem: Problem, username: String, contestId: Long?): Boolean {

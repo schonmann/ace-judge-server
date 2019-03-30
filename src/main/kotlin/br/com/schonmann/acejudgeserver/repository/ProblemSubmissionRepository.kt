@@ -21,6 +21,9 @@ interface ProblemSubmissionRepository : JpaRepository<ProblemSubmission, Long> {
     @Query("select count(distinct p) from ProblemSubmission ps inner join ps.user u inner join ps.problem p inner join p.category c where p.visibility = :visibility and c.category = :category and ps.status in (:status) and u = :user group by p")
     fun countProblemsSolvedByCategory(user : User, visibility: ProblemVisibilityEnum, status : Collection<ProblemSubmissionStatusEnum>, category : ProblemCategoryEnum) : Long?
 
+    @Query("select count(ps) from ProblemSubmission ps inner join ps.user u where ps.status = :status and u = :user")
+    fun countSubmittedWithStatus(user : User, status : Collection<ProblemSubmissionStatusEnum>) : Long?
+
     fun existsByUserAndProblemAndStatusAndParentContest(user : User, problem : Problem, status : ProblemSubmissionStatusEnum, parentContest: Contest?) : Boolean
 
 }

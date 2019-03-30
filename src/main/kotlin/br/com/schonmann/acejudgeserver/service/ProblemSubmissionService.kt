@@ -112,6 +112,10 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
             c to (problemSubmissionRepository.countProblemsSolvedByCategory(user, ProblemVisibilityEnum.PUBLIC, listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER), c) ?: 0)
         }.toMap()
 
-        return ProblemStatisticsDTO(numSolved, numErrored, numSolvedByCategory)
+        val numSubmittedWithStatus : Map<ProblemSubmissionStatusEnum, Long> = ProblemSubmissionStatusEnum.values().map { ss ->
+            ss to (problemSubmissionRepository.countSubmittedWithStatus(user, listOf(ss)) ?: 0)
+        }.toMap()
+
+        return ProblemStatisticsDTO(numSolved, numErrored, numSolvedByCategory, numSubmittedWithStatus)
     }
 }
