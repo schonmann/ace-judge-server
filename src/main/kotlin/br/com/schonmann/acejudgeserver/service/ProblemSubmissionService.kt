@@ -1,13 +1,11 @@
 package br.com.schonmann.acejudgeserver.service
 
+import br.com.schonmann.acejudgeserver.dto.CeleryMessageDTO
 import br.com.schonmann.acejudgeserver.dto.ProblemStatisticsDTO
 import br.com.schonmann.acejudgeserver.dto.RankDTO
 import br.com.schonmann.acejudgeserver.dto.SubmitSolutionDTO
 import br.com.schonmann.acejudgeserver.dto.ws.VerdictNotificationDTO
-import br.com.schonmann.acejudgeserver.enums.NotificationSubjectEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
+import br.com.schonmann.acejudgeserver.enums.*
 import br.com.schonmann.acejudgeserver.exception.ExecutionException
 import br.com.schonmann.acejudgeserver.exception.TimeLimitException
 import br.com.schonmann.acejudgeserver.judge.CorrectnessJudge
@@ -18,6 +16,8 @@ import br.com.schonmann.acejudgeserver.repository.ProblemRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemSubmissionRepository
 import br.com.schonmann.acejudgeserver.repository.UserRepository
 import br.com.schonmann.acejudgeserver.storage.StorageService
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.amqp.core.MessagePostProcessor
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -27,6 +27,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.nio.charset.Charset
 import java.nio.file.Path
 import java.util.*
 import kotlin.system.measureTimeMillis
@@ -39,7 +40,8 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
        private val storageService: StorageService,
        private val rabbitTemplate: RabbitTemplate,
        private val simpMessagingTemplate: SimpMessagingTemplate,
-       private val correctnessJudge: CorrectnessJudge) {
+       private val correctnessJudge: CorrectnessJudge,
+       private val objectMapper : ObjectMapper) {
 
     @Value("\${ace.queues.submission.queue}")
     private lateinit var queueName: String
@@ -63,40 +65,59 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 runtime = null, language = dto.language))
 
         storageService.store(dto.solutionFile!!, "submissions/${submission.id}/solution")
-        rabbitTemplate.convertAndSend(queueName, "${submission.id}")
+
+        val solutionPath = storageService.load("submissions/${submission.id}/solution.${submission.language.extension}")
+        val judgeInputPath: Path = storageService.load("problems/${submission.problem.id}/in")
+        val judgeOutputPath: Path = storageService.load("problems/${submission.problem.id}/out")
+        val inputGeneratorPath: Path = storageService.load("problems/${submission.problem.id}/gen")
+
+        val test = CeleryMessageDTO(task = CeleryTaskEnum.VERDICT.task,
+            args = listOf(
+                submission.id.toString(),
+                solutionPath.toFile().readText(),
+                submission.language.name,
+                judgeInputPath.toFile().readText(),
+                judgeOutputPath.toFile().readText(),
+                if (inputGeneratorPath.toFile().exists()) inputGeneratorPath.toFile().readText() else "",
+                submission.problem.complexities))
+
+        rabbitTemplate.convertAndSend(queueName, test){ x ->
+            x.messageProperties.replyTo = "judgement-queue"
+            x
+        }
     }
 
     @Transactional
     fun judgeSolution(submissionId: Long) {
-
-        val submission: ProblemSubmission = problemSubmissionRepository.getOne(submissionId)
-
-        val language = submission.language
-        val solution: Path = storageService.load("submissions/${submission.id}/solution.${language.extension}")
-        val problemId = submission.problem.id
-        val judgeInput: Path = storageService.load("problems/$problemId/in")
-        val judgeOutput: Path = storageService.load("problems/$problemId/out")
-
-        try {
-            val verdict = correctnessJudge.verdict(solution, language, judgeInput, judgeOutput)
-            submission.status = verdict.status
-            submission.runtime = verdict.runtime
-        } catch (ee: ExecutionException) {
-            submission.status = ProblemSubmissionStatusEnum.COMPILE_ERROR
-        } catch (ee: TimeLimitException) {
-            submission.status = ProblemSubmissionStatusEnum.TIME_LIMIT_EXCEEDED
-        }
-
-        problemSubmissionRepository.save(submission)
-
-        // notify user that his submission is complete! :)
-
-        val notificationDTO = VerdictNotificationDTO(
-                submissionId = submission.id,
-                verdict = submission.status,
-                subject = NotificationSubjectEnum.SUBMISSION_VERDICT)
-
-        simpMessagingTemplate.convertAndSend("/notifications/${submission.user.id}", notificationDTO)
+//
+//        val submission: ProblemSubmission = problemSubmissionRepository.getOne(submissionId)
+//
+//        val language = submission.language
+//        val solution: Path = storageService.load("submissions/${submission.id}/solution.${language.extension}")
+//        val problemId = submission.problem.id
+//        val judgeInput: Path = storageService.load("problems/$problemId/in")
+//        val judgeOutput: Path = storageService.load("problems/$problemId/out")
+//
+//        try {
+//            val verdict = correctnessJudge.verdict(solution, language, judgeInput, judgeOutput)
+//            submission.status = verdict.status
+//            submission.runtime = verdict.runtime
+//        } catch (ee: ExecutionException) {
+//            submission.status = ProblemSubmissionStatusEnum.COMPILE_ERROR
+//        } catch (ee: TimeLimitException) {
+//            submission.status = ProblemSubmissionStatusEnum.TIME_LIMIT_EXCEEDED
+//        }
+//
+//        problemSubmissionRepository.save(submission)
+//
+//        // notify user that his submission is complete! :)
+//
+//        val notificationDTO = VerdictNotificationDTO(
+//                submissionId = submission.id,
+//                verdict = submission.status,
+//                subject = NotificationSubjectEnum.SUBMISSION_VERDICT)
+//
+//        simpMessagingTemplate.convertAndSend("/notifications/${submission.user.id}", notificationDTO)
     }
 
     fun getSubmissionStatistics(username: String): ProblemStatisticsDTO {

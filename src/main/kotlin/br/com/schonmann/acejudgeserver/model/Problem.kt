@@ -15,6 +15,9 @@ class Problem(
         var name: String,
 
         @Column(nullable = false)
+        var complexities: String,
+
+        @Column(nullable = false)
         var score: Long,
 
         @Column(nullable = false, length = 16777215)

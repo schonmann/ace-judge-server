@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile
 data class ProblemSaveDTO(
         val id: Long?,
         val name: String,
+        val complexities: String,
         val score: Long,
         val problemDescription: String,
         val constraintDescription: String,
