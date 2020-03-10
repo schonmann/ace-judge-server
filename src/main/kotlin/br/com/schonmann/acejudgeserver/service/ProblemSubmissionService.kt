@@ -14,8 +14,6 @@ import br.com.schonmann.acejudgeserver.repository.ProblemSubmissionRepository
 import br.com.schonmann.acejudgeserver.repository.UserRepository
 import br.com.schonmann.acejudgeserver.storage.StorageService
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.sun.javaws.exceptions.InvalidArgumentException
-import org.springframework.amqp.core.MessagePostProcessor
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -26,10 +24,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.lang.IllegalArgumentException
-import java.nio.charset.Charset
 import java.nio.file.Path
 import java.util.*
-import kotlin.system.measureTimeMillis
 
 @Service
 class ProblemSubmissionService(@Autowired private val problemSubmissionRepository: ProblemSubmissionRepository,
