@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service
 @Service
 class RabbitReceiverService(@Autowired private val problemSubmissionService: ProblemSubmissionService, private val objectMapper: ObjectMapper) {
 
-    val logger: Logger = LoggerFactory.getLogger(this::class.java)
-
     @RabbitListener(bindings = [
         QueueBinding(
                 value = Queue(value = "\${ace.queues.judgement.queue}"),
@@ -27,6 +25,11 @@ class RabbitReceiverService(@Autowired private val problemSubmissionService: Pro
     fun judgementListener(message : Message) {
         val json = String(message.body)
         val dto = objectMapper.readValue(json, CeleryJudgementDTO::class.java)
+
         println(dto.toString())
+
+        if (dto.result != null) {
+            problemSubmissionService.judgeSolution(dto.result)
+        }
     }
 }

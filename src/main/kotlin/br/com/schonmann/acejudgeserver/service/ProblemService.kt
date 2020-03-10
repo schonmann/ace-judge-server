@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface ProblemService {
-    fun getByFilter(predicate: Predicate, pageable: Pageable): Page<Problem>
     fun getByFilter(pageable: Pageable): Page<Problem>
     fun getByContestsContaining(pageable: Pageable, contestId: Long): Page<Problem>
     fun getById(id : Long) : Problem

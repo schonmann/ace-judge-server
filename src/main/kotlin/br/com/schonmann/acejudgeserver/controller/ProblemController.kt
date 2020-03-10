@@ -11,7 +11,6 @@ import com.querydsl.core.types.Predicate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.querydsl.binding.QuerydslPredicate
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -30,10 +29,7 @@ class ProblemController(@Autowired private val problemService : ProblemService, 
 
     @GetMapping("/query", produces = [MediaType.APPLICATION_JSON_VALUE])
     @PreAuthorize("hasAuthority('VIEW')")
-    fun getByFilter(pageable: Pageable, @QuerydslPredicate(root = Problem::class) predicate : Predicate?): Page<ProblemDTO> {
-        if (predicate != null) {
-            return problemService.getByFilter(predicate, pageable).map { p -> problemDtoWithSolvedFlag(p) }
-        }
+    fun getByFilter(pageable: Pageable): Page<ProblemDTO> {
         return problemService.getByFilter(pageable).map { p -> problemDtoWithSolvedFlag(p) }
     }
 

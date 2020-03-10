@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 
 
 @Repository
-interface ProblemRepository : JpaRepository<Problem, Long>, QuerydslPredicateExecutor<Problem> {
+interface ProblemRepository : JpaRepository<Problem, Long> {
     fun findByNameContaining(pageable: Pageable, name: String): Page<Problem>
     @Query("select problem.* from problem inner join contests_problems on problem.id = contests_problems.problem_id where contests_problems.contest_id = :contestId order by problem.id asc", nativeQuery = true)
     fun findByContestOrderByIdAsc(pageable: Pageable, contestId: Long) : Page<Problem>

@@ -23,10 +23,6 @@ import java.util.*
 class ContestService(@Autowired private val contestRepository: ContestRepository,
                      private val userRepository: UserRepository, private val problemRepository: ProblemRepository) {
 
-    fun getByFilter(predicate: Predicate, pageable: Pageable): Page<Contest> {
-        return contestRepository.findAll(predicate, pageable)
-    }
-
     fun getByFilter(pageable: Pageable): Page<Contest> {
         return contestRepository.findAll(pageable)
     }

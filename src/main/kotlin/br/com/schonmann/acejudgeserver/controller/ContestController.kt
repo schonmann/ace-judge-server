@@ -2,13 +2,10 @@ package br.com.schonmann.acejudgeserver.controller
 
 import br.com.schonmann.acejudgeserver.dto.*
 import br.com.schonmann.acejudgeserver.exception.ForbiddenException
-import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.service.ContestService
-import com.querydsl.core.types.Predicate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.querydsl.binding.QuerydslPredicate
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -20,11 +17,8 @@ class ContestController(@Autowired private val contestService: ContestService) :
 
     @GetMapping("/query", produces = [MediaType.APPLICATION_JSON_VALUE])
     @PreAuthorize("hasAuthority('VIEW')")
-    fun getByFilter(pageable: Pageable, @QuerydslPredicate(root = Contest::class) predicate: Predicate?): Page<ContestListItemDTO> {
+    fun getByFilter(pageable: Pageable): Page<ContestListItemDTO> {
         val username = getRequestUser().username
-        if (predicate != null) {
-            return contestService.getByFilter(predicate, pageable).map { x -> ContestListItemDTO(x, username) }
-        }
         return contestService.getByFilter(pageable).map { x -> ContestListItemDTO(x, username) }
     }
 

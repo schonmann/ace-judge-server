@@ -2,7 +2,6 @@ package br.com.schonmann.acejudgeserver.dto
 
 import br.com.schonmann.acejudgeserver.enums.AnalyzerVerdictEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
-import java.util.*
 
 
 data class JudgeVerdict (
@@ -15,11 +14,14 @@ data class AnalyzerVerdict (
 )
 
 data class JudgementResultDTO(
-        val judgeVerdict : JudgeVerdict,
-        val analyzerVerdict : AnalyzerVerdict
+        val submissionId: Long,
+        val judgeVerdict : JudgeVerdict?,
+        val analyzerVerdict : AnalyzerVerdict?
 )
 
 data class CeleryJudgementDTO (
         val status : String,
-        val result : JudgementResultDTO
+        val result : JudgementResultDTO?,
+        val traceback: String?,
+        val task_id : String
 )

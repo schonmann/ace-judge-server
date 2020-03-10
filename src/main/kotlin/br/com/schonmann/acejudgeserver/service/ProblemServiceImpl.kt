@@ -23,10 +23,6 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun getByFilter(predicate: Predicate, pageable: Pageable): Page<Problem> {
-        return problemRepository.findAll(predicate, pageable)
-    }
-
     override fun getByFilter(pageable: Pageable): Page<Problem> {
         return problemRepository.findAll(pageable)
     }
