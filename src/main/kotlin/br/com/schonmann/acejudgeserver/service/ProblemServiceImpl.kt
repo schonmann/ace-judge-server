@@ -60,6 +60,7 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
                 category = category,
                 name = dto.name,
                 complexities = dto.complexities,
+                bigoNotation = dto.bigoNotation,
                 score =  dto.score,
                 problemDescription = dto.problemDescription,
                 constraintDescription = dto.constraintDescription,

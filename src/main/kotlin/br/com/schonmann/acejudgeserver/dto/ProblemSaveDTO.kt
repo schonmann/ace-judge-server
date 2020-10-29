@@ -10,6 +10,7 @@ data class ProblemSaveDTO(
         val id: Long?,
         val name: String,
         val complexities: String,
+        val bigoNotation: String,
         val score: Long,
         val problemDescription: String,
         val constraintDescription: String,

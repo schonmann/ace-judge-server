@@ -18,6 +18,9 @@ class Problem(
         var complexities: String,
 
         @Column(nullable = false)
+        var bigoNotation: String,
+
+        @Column(nullable = false)
         var score: Long,
 
         @Column(nullable = false, length = 16777215)

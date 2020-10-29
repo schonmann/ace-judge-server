@@ -74,7 +74,8 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 judgeInputPath.toFile().readText(),
                 judgeOutputPath.toFile().readText(),
                 if (inputGeneratorPath.toFile().exists()) inputGeneratorPath.toFile().readText() else "",
-                submission.problem.complexities))
+                submission.problem.complexities,
+                submission.problem.bigoNotation))
 
         rabbitTemplate.convertAndSend(queueName, message){ x ->
             x.messageProperties.replyTo = "judgement-queue"
