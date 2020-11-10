@@ -1,5 +1,6 @@
 package br.com.schonmann.acejudgeserver.model
 
+import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemDifficultyEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
 import com.querydsl.core.annotations.QueryEntity
@@ -16,6 +17,10 @@ class Problem(
 
         @Column(nullable = false)
         var complexities: String,
+
+        @Enumerated(value = EnumType.STRING)
+        @Column(nullable = false)
+        var simulationStatus : ProblemSimulationStatusEnum,
 
         @Column(nullable = false)
         var bigoNotation: String,
