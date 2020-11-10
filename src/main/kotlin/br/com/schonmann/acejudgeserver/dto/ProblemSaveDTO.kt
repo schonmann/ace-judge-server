@@ -3,6 +3,7 @@ package br.com.schonmann.acejudgeserver.dto
 import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemDifficultyEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.web.multipart.MultipartFile
 
@@ -23,6 +24,8 @@ data class ProblemSaveDTO(
         var judgeInputFile: MultipartFile?,
         @JsonIgnore
         var judgeOutputFile: MultipartFile?,
+        @JsonIgnore
+        var judgeAnswerKeyProgramFile: MultipartFile?,
         @JsonIgnore
         var inputGeneratorFile: MultipartFile?
 )

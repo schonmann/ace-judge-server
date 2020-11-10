@@ -2,6 +2,7 @@ package br.com.schonmann.acejudgeserver.service
 
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
 import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.model.User
@@ -67,7 +68,8 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
                 difficulty = dto.difficulty,
                 exampleInput = dto.exampleInput,
                 exampleOutput = dto.exampleOutput,
-                visibility = dto.visibility
+                visibility = dto.visibility,
+                simulationStatus = ProblemSimulationStatusEnum.JUDGE_QUEUE
         )
 
         val problemStored: Problem = problemRepository.save(problem)
@@ -76,6 +78,8 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
 
             storageService.store(dto.judgeInputFile!!, renameTo = "problems/${problemStored.id}/in", ignoreExtension = true)
             storageService.store(dto.judgeOutputFile!!, renameTo = "problems/${problemStored.id}/out", ignoreExtension = true)
+            storageService.store(dto.judgeAnswerKeyProgramFile!!, renameTo = "problems/${problemStored.id}/ans", ignoreExtension = true)
+            storageService.store(dto.inputGeneratorFile!!, renameTo = "problems/${problemStored.id}/gen", ignoreExtension = true)
 
         } else {
 
@@ -84,6 +88,9 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
             }
             if (dto.judgeOutputFile != null) {
                 storageService.store(dto.judgeOutputFile!!, renameTo = "problems/${problemStored.id}/out", ignoreExtension = true)
+            }
+            if (dto.judgeAnswerKeyProgramFile != null) {
+                storageService.store(dto.judgeAnswerKeyProgramFile!!, renameTo = "problems/${problemStored.id}/ans", ignoreExtension = true)
             }
             if (dto.inputGeneratorFile != null) {
                 storageService.store(dto.inputGeneratorFile!!, renameTo = "problems/${problemStored.id}/gen", ignoreExtension = true)
