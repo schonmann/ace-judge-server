@@ -6,4 +6,5 @@ enum class ProblemSimulationStatusEnum(val status : Int) {
     WRONG_ANSWER(2),
     WRONG_COMPLEXITY(3),
     READY(4),
+    COMPILE_ERROR(5),
 }

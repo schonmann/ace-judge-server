@@ -7,6 +7,7 @@ import br.com.schonmann.acejudgeserver.exception.ExecutionException
 import br.com.schonmann.acejudgeserver.exception.TimeLimitException
 import br.com.schonmann.acejudgeserver.judge.CorrectnessJudge
 import br.com.schonmann.acejudgeserver.model.Contest
+import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.model.ProblemSubmission
 import br.com.schonmann.acejudgeserver.repository.ContestRepository
 import br.com.schonmann.acejudgeserver.repository.ProblemRepository
@@ -84,7 +85,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     }
 
     @Transactional
-    fun judgeSolution(judgementResultDTO: JudgementResultDTO) {
+    fun saveJudgementResult(judgementResultDTO: JudgementResultDTO) {
 
         val submission: ProblemSubmission = problemSubmissionRepository.getOne(judgementResultDTO.submissionId)
 
@@ -105,6 +106,13 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 subject = NotificationSubjectEnum.SUBMISSION_VERDICT)
 
         simpMessagingTemplate.convertAndSend("/notifications/${submission.user.id}", notificationDTO)
+    }
+
+    @Transactional
+    fun saveSimulationResult(simulationResultDTO: SimulationResultDTO) {
+        val problem: Problem = problemRepository.getOne(simulationResultDTO.problemId)
+        problem.simulationStatus = simulationResultDTO.simulationVerdict.verdict
+        problemRepository.save(problem)
     }
 
     fun getSubmissionStatistics(username: String): ProblemStatisticsDTO {

@@ -27,5 +27,5 @@ data class ProblemSaveDTO(
         @JsonIgnore
         var judgeAnswerKeyProgramFile: MultipartFile?,
         @JsonIgnore
-        var inputGeneratorFile: MultipartFile?
+        var inputGenerator: MultipartFile?
 )

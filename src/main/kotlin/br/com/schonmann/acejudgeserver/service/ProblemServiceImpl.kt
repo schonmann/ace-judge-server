@@ -1,6 +1,8 @@
 package br.com.schonmann.acejudgeserver.service
 
+import br.com.schonmann.acejudgeserver.dto.CeleryMessageDTO
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
+import br.com.schonmann.acejudgeserver.enums.CeleryTaskEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
 import br.com.schonmann.acejudgeserver.model.Contest
@@ -9,19 +11,23 @@ import br.com.schonmann.acejudgeserver.model.User
 import br.com.schonmann.acejudgeserver.repository.*
 import br.com.schonmann.acejudgeserver.storage.StorageException
 import br.com.schonmann.acejudgeserver.storage.StorageService
-import com.querydsl.core.types.Predicate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Path
 
 @Service
-class ProblemServiceImpl(@Autowired private val problemRepository: ProblemRepository, private val userRepository: UserRepository, private val problemCategoryRepository: ProblemCategoryRepository, private val storageService: StorageService, private val contestRepository: ContestRepository, private val problemSubmissionRepository: ProblemSubmissionRepository) : ProblemService {
+class ProblemServiceImpl(@Autowired private val problemRepository: ProblemRepository, private val userRepository: UserRepository, private val problemCategoryRepository: ProblemCategoryRepository, private val storageService: StorageService, private val contestRepository: ContestRepository, private val problemSubmissionRepository: ProblemSubmissionRepository, private val rabbitTemplate: RabbitTemplate) : ProblemService {
 
+    @Value("\${ace.queues.simulation.queue}")
+    private lateinit var queueName: String
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun getByFilter(pageable: Pageable): Page<Problem> {
@@ -50,12 +56,34 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
         return problemRepository.findByNameContaining(pageable, name)
     }
 
+    fun storeProblemFilesById(id: Long, dto: ProblemSaveDTO) : Boolean {
+        if (dto.id == null) {
+            storageService.store(dto.judgeInputFile!!, renameTo = "problems/${id}/in", ignoreExtension = true)
+            storageService.store(dto.judgeOutputFile!!, renameTo = "problems/${id}/out", ignoreExtension = true)
+            storageService.store(dto.judgeAnswerKeyProgramFile!!, renameTo = "problems/${id}/ans", ignoreExtension = true)
+            storageService.store(dto.inputGenerator!!, renameTo = "problems/${id}/gen", ignoreExtension = true)
+            return true
+        }
+        if (dto.judgeInputFile != null) {
+            storageService.store(dto.judgeInputFile!!, renameTo = "problems/${id}/in", ignoreExtension = true)
+        }
+        if (dto.judgeOutputFile != null) {
+            storageService.store(dto.judgeOutputFile!!, renameTo = "problems/${id}/out", ignoreExtension = true)
+        }
+        if (dto.judgeAnswerKeyProgramFile != null) {
+            storageService.store(dto.judgeAnswerKeyProgramFile!!, renameTo = "problems/${id}/ans", ignoreExtension = true)
+        }
+        if (dto.inputGenerator!= null) {
+            storageService.store(dto.inputGenerator!!, renameTo = "problems/${id}/gen", ignoreExtension = true)
+        }
+        return dto.judgeInputFile != null || dto.judgeOutputFile != null || dto.judgeAnswerKeyProgramFile != null || dto.inputGenerator!= null
+    }
+
     @Throws(StorageException::class)
     @Transactional
     override fun save(dto: ProblemSaveDTO) {
-
         val category = problemCategoryRepository.findOneByCategory(dto.category)
-
+        val existingProblem: Problem? = if (dto.id != null) problemRepository.findByIdOrNull(dto.id) else null
         val problem = Problem(
                 id = dto.id ?: 0,
                 category = category,
@@ -69,31 +97,30 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
                 exampleInput = dto.exampleInput,
                 exampleOutput = dto.exampleOutput,
                 visibility = dto.visibility,
-                simulationStatus = ProblemSimulationStatusEnum.JUDGE_QUEUE
+                simulationStatus = existingProblem?.simulationStatus ?: ProblemSimulationStatusEnum.JUDGE_QUEUE
         )
-
         val problemStored: Problem = problemRepository.save(problem)
+        val shouldRunSimulation = storeProblemFilesById(problem.id, dto)
 
-        if (dto.id == null) {
+        if (shouldRunSimulation) {
+            val judgeInput: Path = storageService.load("problems/${problemStored.id}/in")
+            val judgeOutput: Path = storageService.load("problems/${problemStored.id}/out")
+            val judgeAnswerKeyProgram: Path = storageService.load("problems/${problemStored.id}/ans")
+            val inputGenerator: Path = storageService.load("problems/${problemStored.id}/gen")
 
-            storageService.store(dto.judgeInputFile!!, renameTo = "problems/${problemStored.id}/in", ignoreExtension = true)
-            storageService.store(dto.judgeOutputFile!!, renameTo = "problems/${problemStored.id}/out", ignoreExtension = true)
-            storageService.store(dto.judgeAnswerKeyProgramFile!!, renameTo = "problems/${problemStored.id}/ans", ignoreExtension = true)
-            storageService.store(dto.inputGeneratorFile!!, renameTo = "problems/${problemStored.id}/gen", ignoreExtension = true)
+            val message = CeleryMessageDTO(task = CeleryTaskEnum.SIMULATION.task,
+                    args = listOf(
+                            problem.id.toString(),
+                            judgeInput!!.toFile().readText(),
+                            judgeOutput!!.toFile().readText(),
+                            judgeAnswerKeyProgram!!.toFile().readText(),
+                            inputGenerator!!.toFile().readText(),
+                            problem.complexities,
+                            problem.bigoNotation))
 
-        } else {
-
-            if (dto.judgeInputFile != null) {
-                storageService.store(dto.judgeInputFile!!, renameTo = "problems/${problemStored.id}/in", ignoreExtension = true)
-            }
-            if (dto.judgeOutputFile != null) {
-                storageService.store(dto.judgeOutputFile!!, renameTo = "problems/${problemStored.id}/out", ignoreExtension = true)
-            }
-            if (dto.judgeAnswerKeyProgramFile != null) {
-                storageService.store(dto.judgeAnswerKeyProgramFile!!, renameTo = "problems/${problemStored.id}/ans", ignoreExtension = true)
-            }
-            if (dto.inputGeneratorFile != null) {
-                storageService.store(dto.inputGeneratorFile!!, renameTo = "problems/${problemStored.id}/gen", ignoreExtension = true)
+            rabbitTemplate.convertAndSend(queueName, message){ x ->
+                x.messageProperties.replyTo = "simulation-result-queue"
+                x
             }
         }
     }

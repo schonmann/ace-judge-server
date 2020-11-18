@@ -1,6 +1,7 @@
 package br.com.schonmann.acejudgeserver.queue
 
 import br.com.schonmann.acejudgeserver.dto.CeleryJudgementDTO
+import br.com.schonmann.acejudgeserver.dto.CelerySimulationDTO
 import br.com.schonmann.acejudgeserver.service.ProblemSubmissionService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
@@ -29,7 +30,22 @@ class RabbitReceiverService(@Autowired private val problemSubmissionService: Pro
         println(dto.toString())
 
         if (dto.result != null) {
-            problemSubmissionService.judgeSolution(dto.result)
+            problemSubmissionService.saveJudgementResult(dto.result)
+        }
+    }
+
+    @RabbitListener(bindings = [
+        QueueBinding(
+                value = Queue(value = "\${ace.queues.simulation-result.queue}"),
+                exchange = Exchange(value = "\${ace.queues.simulation-result.exchange}", type = ExchangeTypes.DIRECT))])
+    fun simulationListener(message : Message) {
+        val json = String(message.body)
+        val dto = objectMapper.readValue(json, CelerySimulationDTO::class.java)
+
+        println(dto.toString())
+
+        if (dto.result != null) {
+            problemSubmissionService.saveSimulationResult(dto.result)
         }
     }
 }
