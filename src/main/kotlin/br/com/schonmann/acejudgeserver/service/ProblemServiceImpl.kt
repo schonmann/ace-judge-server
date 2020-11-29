@@ -97,8 +97,11 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
                 exampleInput = dto.exampleInput,
                 exampleOutput = dto.exampleOutput,
                 visibility = dto.visibility,
-                simulationStatus = existingProblem?.simulationStatus ?: ProblemSimulationStatusEnum.JUDGE_QUEUE
+                simulationStatus = existingProblem?.simulationStatus ?: ProblemSimulationStatusEnum.JUDGE_QUEUE,
+                judgeAnswerKeyProgramLanguage = existingProblem?.judgeAnswerKeyProgramLanguage ?: dto.judgeAnswerKeyProgramLanguage!!,
+                inputGeneratorLanguage = existingProblem?.inputGeneratorLanguage ?: dto.inputGeneratorLanguage!!
         )
+
         val problemStored: Problem = problemRepository.save(problem)
         val shouldRunSimulation = storeProblemFilesById(problem.id, dto)
 
@@ -114,7 +117,9 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
                             judgeInput!!.toFile().readText(),
                             judgeOutput!!.toFile().readText(),
                             judgeAnswerKeyProgram!!.toFile().readText(),
+                            problemStored.judgeAnswerKeyProgramLanguage.name,
                             inputGenerator!!.toFile().readText(),
+                            problemStored.inputGeneratorLanguage.name,
                             problem.complexities,
                             problem.bigoNotation))
 

@@ -34,7 +34,7 @@ data class CeleryJudgementDTO (
 
 data class SimulationResultDTO(
         val problemId: Long,
-        val simulationVerdict: SimulationVerdict
+        val simulationVerdict: SimulationVerdict?
 )
 
 data class CelerySimulationDTO (

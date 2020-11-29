@@ -1,9 +1,6 @@
 package br.com.schonmann.acejudgeserver.dto
 
-import br.com.schonmann.acejudgeserver.enums.ProblemCategoryEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemDifficultyEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
+import br.com.schonmann.acejudgeserver.enums.*
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.web.multipart.MultipartFile
 
@@ -20,6 +17,8 @@ data class ProblemSaveDTO(
         val category: ProblemCategoryEnum,
         val difficulty: ProblemDifficultyEnum,
         val visibility: ProblemVisibilityEnum,
+        val judgeAnswerKeyProgramLanguage: LanguageEnum?,
+        val inputGeneratorLanguage: LanguageEnum?,
         @JsonIgnore
         var judgeInputFile: MultipartFile?,
         @JsonIgnore

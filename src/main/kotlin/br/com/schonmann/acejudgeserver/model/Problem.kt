@@ -1,5 +1,6 @@
 package br.com.schonmann.acejudgeserver.model
 
+import br.com.schonmann.acejudgeserver.enums.LanguageEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemDifficultyEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum
@@ -48,6 +49,14 @@ class Problem(
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)
         var visibility: ProblemVisibilityEnum,
+
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        var judgeAnswerKeyProgramLanguage: LanguageEnum,
+
+        @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
+        var inputGeneratorLanguage: LanguageEnum,
 
         @ManyToOne(optional = false)
         var category: ProblemCategory,

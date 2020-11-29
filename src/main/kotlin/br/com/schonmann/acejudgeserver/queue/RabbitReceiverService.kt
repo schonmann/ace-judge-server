@@ -14,10 +14,13 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.lang.Exception
 
 
 @Service
 class RabbitReceiverService(@Autowired private val problemSubmissionService: ProblemSubmissionService, private val objectMapper: ObjectMapper) {
+
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     @RabbitListener(bindings = [
         QueueBinding(
@@ -45,7 +48,14 @@ class RabbitReceiverService(@Autowired private val problemSubmissionService: Pro
         println(dto.toString())
 
         if (dto.result != null) {
-            problemSubmissionService.saveSimulationResult(dto.result)
+            try {
+                problemSubmissionService.saveSimulationResult(dto.result)
+            } catch (e: Exception) {
+                logger.error("Error saving simulation verdict for problem ${dto.task_id}! ${e.message}")
+            }
+
+        } else {
+            logger.error("Error saving simulation verdict for problem ${dto.task_id}!")
         }
     }
 }

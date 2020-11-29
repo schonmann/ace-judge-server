@@ -111,7 +111,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     @Transactional
     fun saveSimulationResult(simulationResultDTO: SimulationResultDTO) {
         val problem: Problem = problemRepository.getOne(simulationResultDTO.problemId)
-        problem.simulationStatus = simulationResultDTO.simulationVerdict.verdict
+        problem.simulationStatus = simulationResultDTO.simulationVerdict?.verdict!!
         problemRepository.save(problem)
     }
 
