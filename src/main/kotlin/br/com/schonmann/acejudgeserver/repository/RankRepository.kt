@@ -15,11 +15,11 @@ interface RankRepository : JpaRepository<User, Long> {
 
     @Transactional
     @Query("select new br.com.schonmann.acejudgeserver.dto.RankDTO(0L, u.name, count(distinct p)) " +
-            "from User u left join u.submissions s left join s.problem p where s.status = br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum.CORRECT_ANSWER and p.visibility = br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum.PUBLIC group by s.problem, u order by count(distinct p) desc")
+            "from User u left join u.submissions s left join s.problem p where s.correctnessStatus = br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER and p.visibility = br.com.schonmann.acejudgeserver.enums.ProblemVisibilityEnum.PUBLIC group by s.problem, u order by count(distinct p) desc")
     fun getGeneralRank(pageable: Pageable): Page<RankDTO>
 
     @Transactional
     @Query("select new br.com.schonmann.acejudgeserver.dto.RankDTO(0L, u.name, count(distinct p)) " +
-            "from User u left join u.submissions s left join s.problem p where s.status = br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum.CORRECT_ANSWER and s.parentContest = :contest group by s.problem, u order by count(distinct p) desc")
+            "from User u left join u.submissions s left join s.problem p where s.correctnessStatus = br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER and s.parentContest = :contest group by s.problem, u order by count(distinct p) desc")
     fun getContestRank(pageable: Pageable, contest : Contest): Page<RankDTO>
 }

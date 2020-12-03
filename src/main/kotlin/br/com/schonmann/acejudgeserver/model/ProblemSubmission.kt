@@ -1,7 +1,9 @@
 package br.com.schonmann.acejudgeserver.model
 
 import br.com.schonmann.acejudgeserver.enums.LanguageEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionAnalysisStatus
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum
 import java.util.*
 import javax.persistence.*
 
@@ -18,7 +20,11 @@ class ProblemSubmission(
 
         @Enumerated(value = EnumType.STRING)
         @Column(nullable = false)
-        var status : ProblemSubmissionStatusEnum,
+        var correctnessStatus : ProblemSubmissionCorrectnessStatusEnum,
+
+        @Enumerated(value = EnumType.STRING)
+        @Column(nullable = false)
+        var analysisStatus : ProblemSubmissionAnalysisStatus,
 
         @ManyToOne(optional = true)
         val parentContest : Contest?,

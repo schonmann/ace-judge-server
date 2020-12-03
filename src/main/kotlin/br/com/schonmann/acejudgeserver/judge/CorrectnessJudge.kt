@@ -3,7 +3,7 @@ package br.com.schonmann.acejudgeserver.judge
 import br.com.schonmann.acejudgeserver.compiler.UniversalCompiler
 import br.com.schonmann.acejudgeserver.dto.VerdictDTO
 import br.com.schonmann.acejudgeserver.enums.LanguageEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum
 import br.com.schonmann.acejudgeserver.model.CompilerResult
 import br.com.schonmann.acejudgeserver.model.SolutionRunnerResult
 import br.com.schonmann.acejudgeserver.runner.UniversalSolutionRunner
@@ -28,9 +28,9 @@ class CorrectnessJudge(@Autowired private val universalCompiler: UniversalCompil
         val expectedOutput : String = judgeOutput.toFile().readText(Charsets.UTF_8)
 
         if(solutionRunResult.output.contentEquals(expectedOutput)) {
-            return VerdictDTO(ProblemSubmissionStatusEnum.CORRECT_ANSWER, runtime)
+            return VerdictDTO(ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER, runtime)
         }
 
-        return VerdictDTO(ProblemSubmissionStatusEnum.WRONG_ANSWER, runtime)
+        return VerdictDTO(ProblemSubmissionCorrectnessStatusEnum.WRONG_ANSWER, runtime)
     }
 }

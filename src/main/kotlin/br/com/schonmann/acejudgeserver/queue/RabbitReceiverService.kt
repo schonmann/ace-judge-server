@@ -1,5 +1,6 @@
 package br.com.schonmann.acejudgeserver.queue
 
+import br.com.schonmann.acejudgeserver.dto.CeleryAnalysisDTO
 import br.com.schonmann.acejudgeserver.dto.CeleryJudgementDTO
 import br.com.schonmann.acejudgeserver.dto.CelerySimulationDTO
 import br.com.schonmann.acejudgeserver.service.ProblemSubmissionService
@@ -33,7 +34,30 @@ class RabbitReceiverService(@Autowired private val problemSubmissionService: Pro
         println(dto.toString())
 
         if (dto.result != null) {
-            problemSubmissionService.saveJudgementResult(dto.result)
+            try {
+                problemSubmissionService.saveJudgementResult(dto.result)
+            } catch (e: Exception) {
+                logger.error("Error saving judgement verdict for problem ${dto.task_id}! ${e.message}")
+            }
+        }
+    }
+
+    @RabbitListener(bindings = [
+        QueueBinding(
+                value = Queue(value = "\${ace.queues.analysis-result.queue}"),
+                exchange = Exchange(value = "\${ace.queues.analysis-result.exchange}", type = ExchangeTypes.DIRECT))])
+    fun analysisListener(message : Message) {
+        val json = String(message.body)
+        val dto = objectMapper.readValue(json, CeleryAnalysisDTO::class.java)
+
+        println(dto.toString())
+
+        if (dto.result != null) {
+            try {
+                problemSubmissionService.saveAnalysisResult(dto.result)
+            } catch (e: Exception) {
+                logger.error("Error saving analysis verdict for problem ${dto.task_id}! ${e.message}")
+            }
         }
     }
 

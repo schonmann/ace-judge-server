@@ -3,8 +3,6 @@ package br.com.schonmann.acejudgeserver.service
 import br.com.schonmann.acejudgeserver.dto.*
 import br.com.schonmann.acejudgeserver.dto.ws.VerdictNotificationDTO
 import br.com.schonmann.acejudgeserver.enums.*
-import br.com.schonmann.acejudgeserver.exception.ExecutionException
-import br.com.schonmann.acejudgeserver.exception.TimeLimitException
 import br.com.schonmann.acejudgeserver.judge.CorrectnessJudge
 import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.Problem
@@ -40,7 +38,10 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
        private val objectMapper : ObjectMapper) {
 
     @Value("\${ace.queues.submission.queue}")
-    private lateinit var queueName: String
+    private lateinit var submissionQueueName: String
+
+    @Value("\${ace.queues.analysis.queue}")
+    private lateinit var analysisQueueName: String
 
     fun getMySubmissions(username: String, pageable: Pageable): Page<ProblemSubmission> {
         return problemSubmissionRepository.findByUserUsernameOrderByIdDesc(username, pageable)
@@ -57,7 +58,9 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         val user = userRepository.getOneByUsername(username)
 
         val submission = problemSubmissionRepository.save(ProblemSubmission(problem = problem, user = user,
-                parentContest = contest, submitDate = Date(dto.timestamp), status = ProblemSubmissionStatusEnum.JUDGE_QUEUE,
+                parentContest = contest, submitDate = Date(dto.timestamp),
+                correctnessStatus = ProblemSubmissionCorrectnessStatusEnum.JUDGE_QUEUE,
+                analysisStatus = ProblemSubmissionAnalysisStatus.JUDGE_QUEUE,
                 runtime = null, language = dto.language))
 
         storageService.store(dto.solutionFile!!, "submissions/${submission.id}/solution")
@@ -65,7 +68,6 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         val solutionPath = storageService.load("submissions/${submission.id}/solution.${submission.language.extension}")
         val judgeInputPath: Path = storageService.load("problems/${submission.problem.id}/in")
         val judgeOutputPath: Path = storageService.load("problems/${submission.problem.id}/out")
-        val inputGeneratorPath: Path = storageService.load("problems/${submission.problem.id}/gen")
 
         val message = CeleryMessageDTO(task = CeleryTaskEnum.VERDICT.task,
             args = listOf(
@@ -73,12 +75,9 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 solutionPath.toFile().readText(),
                 submission.language.name,
                 judgeInputPath.toFile().readText(),
-                judgeOutputPath.toFile().readText(),
-                if (inputGeneratorPath.toFile().exists()) inputGeneratorPath.toFile().readText() else "",
-                submission.problem.complexities,
-                submission.problem.bigoNotation))
+                judgeOutputPath.toFile().readText()))
 
-        rabbitTemplate.convertAndSend(queueName, message){ x ->
+        rabbitTemplate.convertAndSend(submissionQueueName, message){ x ->
             x.messageProperties.replyTo = "judgement-queue"
             x
         }
@@ -93,19 +92,45 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
             throw IllegalArgumentException("judge verdict must not be null, submission should be reprocessed!")
         }
 
-        submission.status = judgementResultDTO.judgeVerdict.verdict
+        submission.correctnessStatus = judgementResultDTO.judgeVerdict.verdict
         submission.runtime = judgementResultDTO.judgeVerdict.runtime
 
         problemSubmissionRepository.save(submission)
+
+        val solutionPath = storageService.load("submissions/${submission.id}/solution.${submission.language.extension}")
+        val inputGeneratorPath: Path = storageService.load("problems/${submission.problem.id}/gen")
+
+        if (submission.correctnessStatus == ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER) {
+            val message = CeleryMessageDTO(task = CeleryTaskEnum.ANALYSIS.task,
+                    args = listOf(
+                            submission.id.toString(),
+                            submission.problem.id.toString(),
+                            solutionPath.toFile().readText(),
+                            submission.language.name,
+                            inputGeneratorPath.toFile().readText(),
+                            submission.problem.complexities,
+                            submission.problem.bigoNotation))
+
+            rabbitTemplate.convertAndSend(analysisQueueName, message){ x ->
+                x.messageProperties.replyTo = "analysis-result-queue"
+                x
+            }
+        }
 
         // notify user that his submission is complete! :)
 
         val notificationDTO = VerdictNotificationDTO(
                 submissionId = submission.id,
-                verdict = submission.status,
+                verdict = submission.correctnessStatus,
                 subject = NotificationSubjectEnum.SUBMISSION_VERDICT)
 
         simpMessagingTemplate.convertAndSend("/notifications/${submission.user.id}", notificationDTO)
+    }
+
+    @Transactional
+    fun saveAnalysisResult(analysisResultDTO: AnalysisResultDTO) {
+        val submission: ProblemSubmission = problemSubmissionRepository.getOne(analysisResultDTO.submissionId)
+        submission.correctnessStatus
     }
 
     @Transactional
@@ -119,17 +144,17 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
 
         val user = userRepository.getOneByUsername(username)
 
-        val numSolved : Long = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
-                listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER)) ?: 0
-        val numErrored : Long = problemSubmissionRepository.countByVisibilityAndStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
-                listOf(ProblemSubmissionStatusEnum.WRONG_ANSWER, ProblemSubmissionStatusEnum.COMPILE_ERROR, ProblemSubmissionStatusEnum.RUNTIME_ERROR)) ?: 0
+        val numSolved : Long = problemSubmissionRepository.countByVisibilityAndCorrectnessStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
+                listOf(ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER)) ?: 0
+        val numErrored : Long = problemSubmissionRepository.countByVisibilityAndCorrectnessStatusInGroupByProblem(user, ProblemVisibilityEnum.PUBLIC,
+                listOf(ProblemSubmissionCorrectnessStatusEnum.WRONG_ANSWER, ProblemSubmissionCorrectnessStatusEnum.COMPILE_ERROR, ProblemSubmissionCorrectnessStatusEnum.RUNTIME_ERROR)) ?: 0
 
         val numSolvedByCategory : Map<ProblemCategoryEnum, Long> = ProblemCategoryEnum.values().map { c ->
-            c to (problemSubmissionRepository.countProblemsSolvedByCategory(user, ProblemVisibilityEnum.PUBLIC, listOf(ProblemSubmissionStatusEnum.CORRECT_ANSWER), c) ?: 0)
+            c to (problemSubmissionRepository.countProblemsSolvedByCategory(user, ProblemVisibilityEnum.PUBLIC, listOf(ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER), c) ?: 0)
         }.toMap()
 
-        val numSubmittedWithStatus : Map<ProblemSubmissionStatusEnum, Long> = ProblemSubmissionStatusEnum.values().map { ss ->
-            ss to (problemSubmissionRepository.countSubmittedWithStatus(user, listOf(ss)) ?: 0)
+        val numSubmittedWithStatus : Map<ProblemSubmissionCorrectnessStatusEnum, Long> = ProblemSubmissionCorrectnessStatusEnum.values().map { ss ->
+            ss to (problemSubmissionRepository.countSubmittedWithCorrectnessStatus(user, listOf(ss)) ?: 0)
         }.toMap()
 
         return ProblemStatisticsDTO(numSolved, numErrored, numSolvedByCategory, numSubmittedWithStatus)

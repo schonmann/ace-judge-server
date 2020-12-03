@@ -1,8 +1,8 @@
 package br.com.schonmann.acejudgeserver.dto
 
-import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum
 
 data class VerdictDTO(
-    val status : ProblemSubmissionStatusEnum,
-    val runtime : Double
+        val status : ProblemSubmissionCorrectnessStatusEnum,
+        val runtime : Double
 )

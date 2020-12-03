@@ -3,7 +3,7 @@ package br.com.schonmann.acejudgeserver.service
 import br.com.schonmann.acejudgeserver.dto.CeleryMessageDTO
 import br.com.schonmann.acejudgeserver.dto.ProblemSaveDTO
 import br.com.schonmann.acejudgeserver.enums.CeleryTaskEnum
-import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
 import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.Problem
@@ -43,9 +43,9 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
         val contest : Contest? = if (contestId != null) contestRepository.findByIdOrNull(contestId) else null
         val user : User = userRepository.getOneByUsername(username)
 
-        val statusCorrectAnswer = ProblemSubmissionStatusEnum.CORRECT_ANSWER
+        val statusCorrectAnswer = ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER
 
-        return problemSubmissionRepository.existsByUserAndProblemAndStatusAndParentContest(user, problem, statusCorrectAnswer, contest)
+        return problemSubmissionRepository.existsByUserAndProblemAndCorrectnessStatusAndParentContest(user, problem, statusCorrectAnswer, contest)
     }
 
     override fun getById(id: Long): Problem {

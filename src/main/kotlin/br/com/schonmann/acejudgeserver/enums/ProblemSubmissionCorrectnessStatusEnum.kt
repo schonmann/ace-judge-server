@@ -1,6 +1,6 @@
 package br.com.schonmann.acejudgeserver.enums
 
-enum class ProblemSubmissionStatusEnum(val status : Int) {
+enum class ProblemSubmissionCorrectnessStatusEnum(val status : Int) {
     JUDGE_QUEUE(0),
     CORRECT_ANSWER(3), // WTF???
     WRONG_ANSWER(1),
