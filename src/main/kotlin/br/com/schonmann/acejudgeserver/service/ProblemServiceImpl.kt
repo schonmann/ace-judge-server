@@ -76,7 +76,7 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
         if (dto.inputGenerator!= null) {
             storageService.store(dto.inputGenerator!!, renameTo = "problems/${id}/gen", ignoreExtension = true)
         }
-        return dto.judgeInputFile != null || dto.judgeOutputFile != null || dto.judgeAnswerKeyProgramFile != null || dto.inputGenerator!= null
+        return dto.judgeAnswerKeyProgramFile != null || dto.inputGenerator!= null
     }
 
     @Throws(StorageException::class)
@@ -106,16 +106,12 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
         val shouldRunSimulation = storeProblemFilesById(problem.id, dto)
 
         if (shouldRunSimulation) {
-            val judgeInput: Path = storageService.load("problems/${problemStored.id}/in")
-            val judgeOutput: Path = storageService.load("problems/${problemStored.id}/out")
             val judgeAnswerKeyProgram: Path = storageService.load("problems/${problemStored.id}/ans")
             val inputGenerator: Path = storageService.load("problems/${problemStored.id}/gen")
 
             val message = CeleryMessageDTO(task = CeleryTaskEnum.SIMULATION.task,
                     args = listOf(
                             problem.id.toString(),
-                            judgeInput!!.toFile().readText(),
-                            judgeOutput!!.toFile().readText(),
                             judgeAnswerKeyProgram!!.toFile().readText(),
                             problemStored.judgeAnswerKeyProgramLanguage.name,
                             inputGenerator!!.toFile().readText(),
