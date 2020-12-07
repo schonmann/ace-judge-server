@@ -43,6 +43,9 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     @Value("\${ace.queues.analysis.queue}")
     private lateinit var analysisQueueName: String
 
+    @Value("\${ace.queues.analysis-result.queue}")
+    private lateinit var analysisResultQueueName: String
+
     fun getMySubmissions(username: String, pageable: Pageable): Page<ProblemSubmission> {
         return problemSubmissionRepository.findByUserUsernameOrderByIdDesc(username, pageable)
     }
@@ -98,21 +101,23 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         problemSubmissionRepository.save(submission)
 
         val solutionPath = storageService.load("submissions/${submission.id}/solution.${submission.language.extension}")
-        val inputGeneratorPath: Path = storageService.load("problems/${submission.problem.id}/gen")
+        val inputGenerator: Path = storageService.load("problems/${submission.problem.id}/gen")
+
 
         if (submission.correctnessStatus == ProblemSubmissionCorrectnessStatusEnum.CORRECT_ANSWER) {
             val message = CeleryMessageDTO(task = CeleryTaskEnum.ANALYSIS.task,
                     args = listOf(
                             submission.id.toString(),
                             submission.problem.id.toString(),
-                            solutionPath.toFile().readText(),
+                            solutionPath!!.toFile().readText(),
                             submission.language.name,
-                            inputGeneratorPath.toFile().readText(),
+                            inputGenerator!!.toFile().readText(),
+                            submission.problem.inputGeneratorLanguage.name,
                             submission.problem.complexities,
                             submission.problem.bigoNotation))
 
             rabbitTemplate.convertAndSend(analysisQueueName, message){ x ->
-                x.messageProperties.replyTo = "analysis-result-queue"
+                x.messageProperties.replyTo = analysisResultQueueName
                 x
             }
         }
@@ -130,7 +135,9 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     @Transactional
     fun saveAnalysisResult(analysisResultDTO: AnalysisResultDTO) {
         val submission: ProblemSubmission = problemSubmissionRepository.getOne(analysisResultDTO.submissionId)
-        submission.correctnessStatus
+        submission.analysisStatus = analysisResultDTO.analysisVerdict?.verdict!!
+        problemSubmissionRepository.save(submission)
+
     }
 
     @Transactional

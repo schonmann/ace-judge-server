@@ -2,6 +2,7 @@ package br.com.schonmann.acejudgeserver.dto
 
 import br.com.schonmann.acejudgeserver.enums.AnalyzerVerdictEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
+import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionAnalysisStatus
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum
 
 
@@ -46,13 +47,13 @@ data class CelerySimulationDTO (
 
 data class AnalysisVerdict(
         val runtime: Double,
-        val verdict: ProblemSimulationStatusEnum
+        val verdict: ProblemSubmissionAnalysisStatus
 )
 
 data class AnalysisResultDTO(
         val submissionId: Long,
         val problemId: Long,
-        val verdict: AnalysisVerdict?
+        val analysisVerdict: AnalysisVerdict?
 )
 
 data class CeleryAnalysisDTO (
