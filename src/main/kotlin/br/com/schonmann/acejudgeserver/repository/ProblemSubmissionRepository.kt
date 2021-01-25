@@ -26,4 +26,6 @@ interface ProblemSubmissionRepository : JpaRepository<ProblemSubmission, Long> {
 
     fun existsByUserAndProblemAndCorrectnessStatusAndParentContest(user : User, problem : Problem, correctnessStatus : ProblemSubmissionCorrectnessStatusEnum, parentContest: Contest?) : Boolean
 
+    fun existsByProblem(problem: Problem) : Boolean
+
 }

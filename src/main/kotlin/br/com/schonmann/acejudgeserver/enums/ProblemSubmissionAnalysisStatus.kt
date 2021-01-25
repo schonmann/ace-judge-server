@@ -6,4 +6,5 @@ enum class ProblemSubmissionAnalysisStatus (val status : Int) {
     WRONG_COMPLEXITY(2),
     COMPILE_ERROR(3),
     CORRECT_COMPLEXITY(4),
+    READY(5),
 }

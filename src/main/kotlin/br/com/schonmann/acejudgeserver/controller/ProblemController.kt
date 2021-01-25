@@ -24,6 +24,7 @@ class ProblemController(@Autowired private val problemService : ProblemService, 
     fun problemDtoWithSolvedFlag(problem : Problem) : ProblemDTO {
         val dto = ProblemDTO(problem)
         dto.solved = problemService.isProblemSolved(problem, getRequestUser().username)
+        dto.editable = problemService.isProblemEditable(problem)
         return dto
     }
 
@@ -57,7 +58,10 @@ class ProblemController(@Autowired private val problemService : ProblemService, 
     @PreAuthorize("hasAuthority('VIEW')")
     fun getById(@RequestParam("id") id : Long): ResponseEntity<ProblemDTO> {
         val problem = problemService.getById(id)
-        return ResponseEntity.ok(ProblemDTO(problem))
+        val editable = problemService.isProblemEditable(problem)
+        val dto = ProblemDTO(problem)
+        dto.editable = editable
+        return ResponseEntity.ok(dto)
     }
 
     @GetMapping("/queryByName", produces = [MediaType.APPLICATION_JSON_VALUE])

@@ -26,6 +26,10 @@ class ProblemSubmission(
         @Column(nullable = false)
         var analysisStatus : ProblemSubmissionAnalysisStatus,
 
+        @Lob
+        @Column(nullable = true, length = 16777215)
+        var analysisOutput : String?,
+
         @ManyToOne(optional = true)
         val parentContest : Contest?,
 

@@ -23,6 +23,10 @@ class Problem(
         @Column(nullable = false)
         var simulationStatus : ProblemSimulationStatusEnum,
 
+        @Lob
+        @Column(nullable = true, length = 16777215)
+        var analysisOutput : String?,
+
         @Column(nullable = false)
         var bigoNotation: String,
 

@@ -34,6 +34,14 @@ class ProblemSubmissionController(@Autowired private val problemSubmissionServic
         return problemSubmissionService.getMySubmissions(getRequestUser().username, pageable).map { x -> ProblemSubmissionDTO(x) }
     }
 
+    @GetMapping("/getById", params = ["id"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PreAuthorize("hasAuthority('VIEW')")
+    @Transactional
+    fun getById(@RequestParam("id") id : Long): ProblemSubmissionDTO {
+        val submission = problemSubmissionService.getById(id)
+        return ProblemSubmissionDTO(submission)
+    }
+
     @PostMapping("/submit", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @PreAuthorize("hasAuthority('VIEW')")
     fun submitProblem(@RequestParam("file") solutionFile: MultipartFile, @RequestParam params : String) {

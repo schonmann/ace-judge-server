@@ -3,14 +3,10 @@ package br.com.schonmann.acejudgeserver.service
 import br.com.schonmann.acejudgeserver.dto.*
 import br.com.schonmann.acejudgeserver.dto.ws.VerdictNotificationDTO
 import br.com.schonmann.acejudgeserver.enums.*
-import br.com.schonmann.acejudgeserver.judge.CorrectnessJudge
 import br.com.schonmann.acejudgeserver.model.Contest
 import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.model.ProblemSubmission
-import br.com.schonmann.acejudgeserver.repository.ContestRepository
-import br.com.schonmann.acejudgeserver.repository.ProblemRepository
-import br.com.schonmann.acejudgeserver.repository.ProblemSubmissionRepository
-import br.com.schonmann.acejudgeserver.repository.UserRepository
+import br.com.schonmann.acejudgeserver.repository.*
 import br.com.schonmann.acejudgeserver.storage.StorageService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.amqp.rabbit.core.RabbitTemplate
@@ -34,8 +30,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
        private val storageService: StorageService,
        private val rabbitTemplate: RabbitTemplate,
        private val simpMessagingTemplate: SimpMessagingTemplate,
-       private val correctnessJudge: CorrectnessJudge,
-       private val objectMapper : ObjectMapper) {
+       private val objectMapper: ObjectMapper) {
 
     @Value("\${ace.queues.submission.queue}")
     private lateinit var submissionQueueName: String
@@ -48,6 +43,10 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
 
     fun getMySubmissions(username: String, pageable: Pageable): Page<ProblemSubmission> {
         return problemSubmissionRepository.findByUserUsernameOrderByIdDesc(username, pageable)
+    }
+
+    fun getById(id : Long): ProblemSubmission {
+        return problemSubmissionRepository.getOne(id)
     }
 
     fun getRankByContest(pageable: Pageable): Page<RankDTO> {
@@ -64,7 +63,9 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 parentContest = contest, submitDate = Date(dto.timestamp),
                 correctnessStatus = ProblemSubmissionCorrectnessStatusEnum.JUDGE_QUEUE,
                 analysisStatus = ProblemSubmissionAnalysisStatus.JUDGE_QUEUE,
-                runtime = null, language = dto.language))
+                analysisOutput = null,
+                runtime = null,
+                language = dto.language))
 
         storageService.store(dto.solutionFile!!, "submissions/${submission.id}/solution")
 
@@ -136,6 +137,8 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     fun saveAnalysisResult(analysisResultDTO: AnalysisResultDTO) {
         val submission: ProblemSubmission = problemSubmissionRepository.getOne(analysisResultDTO.submissionId)
         submission.analysisStatus = analysisResultDTO.analysisVerdict?.verdict!!
+        val analysisOutput = objectMapper.writeValueAsString(analysisResultDTO.analysisVerdict.analysisOutput)
+        submission.analysisOutput = analysisOutput
         problemSubmissionRepository.save(submission)
 
     }
@@ -144,6 +147,8 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
     fun saveSimulationResult(simulationResultDTO: SimulationResultDTO) {
         val problem: Problem = problemRepository.getOne(simulationResultDTO.problemId)
         problem.simulationStatus = simulationResultDTO.simulationVerdict?.verdict!!
+        val analysisOutput = objectMapper.writeValueAsString(simulationResultDTO.simulationVerdict.analysisOutput)
+        problem.analysisOutput = analysisOutput
         problemRepository.save(problem)
     }
 

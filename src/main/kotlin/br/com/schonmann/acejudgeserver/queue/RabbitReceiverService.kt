@@ -56,7 +56,7 @@ class RabbitReceiverService(@Autowired private val problemSubmissionService: Pro
             try {
                 problemSubmissionService.saveAnalysisResult(dto.result)
             } catch (e: Exception) {
-                logger.error("Error saving analysis verdict for problem ${dto.task_id}! ${e.message}")
+                logger.error("Error saving analysis verdict for problem ${dto.task_id}! ${e.stackTrace?.contentToString()}")
             }
         }
     }

@@ -99,23 +99,20 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
                 visibility = dto.visibility,
                 simulationStatus = existingProblem?.simulationStatus ?: ProblemSimulationStatusEnum.JUDGE_QUEUE,
                 judgeAnswerKeyProgramLanguage = existingProblem?.judgeAnswerKeyProgramLanguage ?: dto.judgeAnswerKeyProgramLanguage!!,
-                inputGeneratorLanguage = existingProblem?.inputGeneratorLanguage ?: dto.inputGeneratorLanguage!!
+                inputGeneratorLanguage = existingProblem?.inputGeneratorLanguage ?: dto.inputGeneratorLanguage!!,
+                analysisOutput = existingProblem?.analysisOutput
         )
 
         val problemStored: Problem = problemRepository.save(problem)
         val shouldRunSimulation = storeProblemFilesById(problem.id, dto)
 
         if (shouldRunSimulation) {
-            val judgeInput: Path = storageService.load("problems/${problemStored.id}/in")
-            val judgeOutput: Path = storageService.load("problems/${problemStored.id}/out")
             val judgeAnswerKeyProgram: Path = storageService.load("problems/${problemStored.id}/ans")
             val inputGenerator: Path = storageService.load("problems/${problemStored.id}/gen")
 
             val message = CeleryMessageDTO(task = CeleryTaskEnum.SIMULATION.task,
                     args = listOf(
                             problem.id.toString(),
-                            judgeInput!!.toFile().readText(),
-                            judgeOutput!!.toFile().readText(),
                             judgeAnswerKeyProgram!!.toFile().readText(),
                             problemStored.judgeAnswerKeyProgramLanguage.name,
                             inputGenerator!!.toFile().readText(),
@@ -128,5 +125,9 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
                 x
             }
         }
+    }
+
+    override fun isProblemEditable(problem: Problem): Boolean {
+        return !problemSubmissionRepository.existsByProblem(problem)
     }
 }
