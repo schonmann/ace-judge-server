@@ -5,6 +5,7 @@ import br.com.schonmann.acejudgeserver.enums.ProblemSimulationStatusEnum
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionAnalysisStatus
 import br.com.schonmann.acejudgeserver.enums.ProblemSubmissionCorrectnessStatusEnum
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.sun.org.apache.xpath.internal.operations.Bool
 
 
 data class JudgeVerdict (
@@ -78,7 +79,8 @@ data class FunctionDTO (
         val error : Double,
         val values : List<Double>,
         val full_expression : String,
-        val latex_expression : String
+        val latex_expression : String,
+        val chosen : Boolean?
 )
 
 data class AnalysisResultDTO(
