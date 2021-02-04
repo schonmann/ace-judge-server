@@ -20,8 +20,6 @@ data class ProblemSaveDTO(
         val judgeAnswerKeyProgramLanguage: LanguageEnum?,
         val inputGeneratorLanguage: LanguageEnum?,
         @JsonIgnore
-        var judgeInputFile: MultipartFile?,
-        @JsonIgnore
         var judgeOutputFile: MultipartFile?,
         @JsonIgnore
         var judgeAnswerKeyProgramFile: MultipartFile?,

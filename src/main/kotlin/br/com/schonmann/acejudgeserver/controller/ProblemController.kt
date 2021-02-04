@@ -42,11 +42,10 @@ class ProblemController(@Autowired private val problemService : ProblemService, 
 
     @PostMapping("/save", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @PreAuthorize("hasAuthority('PROBLEM_CRUD')")
-    fun save(@RequestParam judgeInput: MultipartFile?, @RequestParam judgeOutput: MultipartFile?, @RequestParam judgeAnswerKeyProgram: MultipartFile?, @RequestParam inputGenerator: MultipartFile?, @RequestParam params : String) {
+    fun save(@RequestParam judgeOutput: MultipartFile?, @RequestParam judgeAnswerKeyProgram: MultipartFile?, @RequestParam inputGenerator: MultipartFile?, @RequestParam params : String) {
 
         val dto : ProblemSaveDTO = objectMapper.readValue(params)
 
-        dto.judgeInputFile = judgeInput
         dto.judgeOutputFile = judgeOutput
         dto.judgeAnswerKeyProgramFile = judgeAnswerKeyProgram
         dto.inputGenerator = inputGenerator

@@ -69,7 +69,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
 
         storageService.store(dto.solutionFile!!.bytes, "submissions/${submission.id}/solution")
 
-        val solutionPath = storageService.load("submissions/${submission.id}/solution.${submission.language.extension}")
+        val solutionPath = storageService.load("submissions/${submission.id}/solution")
         val judgeInputPath: Path = storageService.load("problems/${submission.problem.id}/in")
         val judgeOutputPath: Path = storageService.load("problems/${submission.problem.id}/out")
 
@@ -101,7 +101,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
 
         problemSubmissionRepository.save(submission)
 
-        val solutionPath = storageService.load("submissions/${submission.id}/solution.${submission.language.extension}")
+        val solutionPath = storageService.load("submissions/${submission.id}/solution")
         val inputGenerator: Path = storageService.load("problems/${submission.problem.id}/gen")
 
 
@@ -150,6 +150,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         val analysisOutput = objectMapper.writeValueAsString(simulationResultDTO.simulationVerdict.analysisOutput)
         problem.analysisOutput = analysisOutput
         val generatedInput = simulationResultDTO.simulationVerdict.generatedInput
+        // foo zin war
         storageService.store(generatedInput.toByteArray(), filename = "problems/${problem.id}/in", ignoreExtension = true)
         problemRepository.save(problem)
     }

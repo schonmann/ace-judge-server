@@ -2,9 +2,11 @@
 # Build stage
 #
 FROM maven:alpine AS build
-COPY src /home/app/src
-COPY pom.xml /home/app
-RUN mvn -Dmaven.test.skip=true -f /home/app/pom.xml clean package
+WORKDIR /home/app/
+COPY pom.xml .
+RUN mvn -Dmaven.test.skip=true verify clean --fail-never
+COPY src src
+RUN mvn -Dmaven.test.skip=true package
 
 #
 # Package stage
