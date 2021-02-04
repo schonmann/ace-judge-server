@@ -67,7 +67,7 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                 runtime = null,
                 language = dto.language))
 
-        storageService.store(dto.solutionFile!!, "submissions/${submission.id}/solution")
+        storageService.store(dto.solutionFile!!.bytes, "submissions/${submission.id}/solution")
 
         val solutionPath = storageService.load("submissions/${submission.id}/solution.${submission.language.extension}")
         val judgeInputPath: Path = storageService.load("problems/${submission.problem.id}/in")
@@ -149,6 +149,8 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         problem.simulationStatus = simulationResultDTO.simulationVerdict?.verdict!!
         val analysisOutput = objectMapper.writeValueAsString(simulationResultDTO.simulationVerdict.analysisOutput)
         problem.analysisOutput = analysisOutput
+        val generatedInput = simulationResultDTO.simulationVerdict.generatedInput
+        storageService.store(generatedInput.toByteArray(), filename = "problems/${problem.id}/in", ignoreExtension = true)
         problemRepository.save(problem)
     }
 

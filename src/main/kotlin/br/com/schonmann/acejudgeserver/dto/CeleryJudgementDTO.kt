@@ -28,7 +28,9 @@ data class SimulationVerdict (
         @JsonProperty("analysis_output")
         val analysisOutput: AnalysisOutputDTO,
         @JsonProperty("simulation_output")
-        val simulationOutput: SimulationOutputDTO?
+        val simulationOutput: SimulationOutputDTO?,
+        @JsonProperty("generated_input")
+        val generatedInput: String
 )
 
 data class AnalysisVerdict(

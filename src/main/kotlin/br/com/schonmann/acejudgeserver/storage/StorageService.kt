@@ -11,7 +11,7 @@ interface StorageService {
     fun init()
 
     @Throws(StorageException::class)
-    fun store(file: MultipartFile, renameTo: String? = null, ignoreExtension : Boolean = false)
+    fun store(byteArray : ByteArray, filename : String, ignoreExtension : Boolean = false)
 
     fun loadAll(): Stream<Path>
 
