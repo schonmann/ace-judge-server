@@ -58,13 +58,13 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
 
     fun storeProblemFilesById(id: Long, dto: ProblemSaveDTO) : Boolean {
         if (dto.id == null) {
-            storageService.store(dto.judgeOutputFile!!.bytes, filename = "problems/${id}/out", ignoreExtension = true)
+            storageService.store(dto.judgeInputFile!!.bytes, filename = "problems/${id}/out", ignoreExtension = true)
             storageService.store(dto.judgeAnswerKeyProgramFile!!.bytes, filename = "problems/${id}/ans", ignoreExtension = true)
             storageService.store(dto.inputGenerator!!.bytes, filename = "problems/${id}/gen", ignoreExtension = true)
             return true
         }
-        if (dto.judgeOutputFile != null) {
-            storageService.store(dto.judgeOutputFile!!.bytes, filename = "problems/${id}/out", ignoreExtension = true)
+        if (dto.judgeInputFile != null) {
+            storageService.store(dto.judgeInputFile!!.bytes, filename = "problems/${id}/out", ignoreExtension = true)
         }
         if (dto.judgeAnswerKeyProgramFile != null) {
             storageService.store(dto.judgeAnswerKeyProgramFile!!.bytes, filename = "problems/${id}/ans", ignoreExtension = true)
@@ -72,7 +72,7 @@ class ProblemServiceImpl(@Autowired private val problemRepository: ProblemReposi
         if (dto.inputGenerator!= null) {
             storageService.store(dto.inputGenerator!!.bytes, filename = "problems/${id}/gen", ignoreExtension = true)
         }
-        return dto.judgeOutputFile != null || dto.judgeAnswerKeyProgramFile != null || dto.inputGenerator!= null
+        return dto.judgeInputFile != null || dto.judgeAnswerKeyProgramFile != null || dto.inputGenerator!= null
     }
 
     @Throws(StorageException::class)

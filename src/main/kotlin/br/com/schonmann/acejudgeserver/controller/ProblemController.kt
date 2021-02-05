@@ -7,7 +7,6 @@ import br.com.schonmann.acejudgeserver.model.Problem
 import br.com.schonmann.acejudgeserver.service.ProblemService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.querydsl.core.types.Predicate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -42,11 +41,11 @@ class ProblemController(@Autowired private val problemService : ProblemService, 
 
     @PostMapping("/save", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @PreAuthorize("hasAuthority('PROBLEM_CRUD')")
-    fun save(@RequestParam judgeOutput: MultipartFile?, @RequestParam judgeAnswerKeyProgram: MultipartFile?, @RequestParam inputGenerator: MultipartFile?, @RequestParam params : String) {
+    fun save(@RequestParam judgeInput: MultipartFile?, @RequestParam judgeAnswerKeyProgram: MultipartFile?, @RequestParam inputGenerator: MultipartFile?, @RequestParam params : String) {
 
         val dto : ProblemSaveDTO = objectMapper.readValue(params)
 
-        dto.judgeOutputFile = judgeOutput
+        dto.judgeInputFile = judgeInput
         dto.judgeAnswerKeyProgramFile = judgeAnswerKeyProgram
         dto.inputGenerator = inputGenerator
 

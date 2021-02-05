@@ -110,9 +110,9 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
                     args = listOf(
                             submission.id.toString(),
                             submission.problem.id.toString(),
-                            solutionPath!!.toFile().readText(),
+                            solutionPath.toFile().readText(),
                             submission.language.name,
-                            inputGenerator!!.toFile().readText(),
+                            inputGenerator.toFile().readText(),
                             submission.problem.inputGeneratorLanguage.name,
                             submission.problem.complexities,
                             submission.problem.bigoNotation))
@@ -149,9 +149,8 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         problem.simulationStatus = simulationResultDTO.simulationVerdict?.verdict!!
         val analysisOutput = objectMapper.writeValueAsString(simulationResultDTO.simulationVerdict.analysisOutput)
         problem.analysisOutput = analysisOutput
-        val generatedInput = simulationResultDTO.simulationVerdict.generatedInput
-        // foo zin war
-        storageService.store(generatedInput.toByteArray(), filename = "problems/${problem.id}/in", ignoreExtension = true)
+        val generatedOutput = simulationResultDTO.simulationVerdict.generatedOutput
+        storageService.store(generatedOutput.toByteArray(), filename = "problems/${problem.id}/out", ignoreExtension = true)
         problemRepository.save(problem)
     }
 
