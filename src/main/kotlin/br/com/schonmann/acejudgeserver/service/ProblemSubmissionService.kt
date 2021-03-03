@@ -149,8 +149,10 @@ class ProblemSubmissionService(@Autowired private val problemSubmissionRepositor
         problem.simulationStatus = simulationResultDTO.simulationVerdict?.verdict!!
         val analysisOutput = objectMapper.writeValueAsString(simulationResultDTO.simulationVerdict.analysisOutput)
         problem.analysisOutput = analysisOutput
-        val generatedOutput = simulationResultDTO.simulationVerdict.generatedOutput
-        storageService.store(generatedOutput.toByteArray(), filename = "problems/${problem.id}/out", ignoreExtension = true)
+        val generatedOutput = simulationResultDTO.generatedOutput
+        if(generatedOutput != null) {
+            storageService.store(generatedOutput.toByteArray(), filename = "problems/${problem.id}/out", ignoreExtension = true)
+        }
         problemRepository.save(problem)
     }
 

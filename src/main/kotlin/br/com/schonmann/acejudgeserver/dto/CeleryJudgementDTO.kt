@@ -26,18 +26,16 @@ data class SimulationVerdict (
         val runtime: Double,
         val verdict: ProblemSimulationStatusEnum,
         @JsonProperty("analysis_output")
-        val analysisOutput: AnalysisOutputDTO,
+        val analysisOutput: AnalysisOutputDTO?,
         @JsonProperty("simulation_output")
-        val simulationOutput: SimulationOutputDTO?,
-        @JsonProperty("generated_input")
-        val generatedOutput: String
+        val simulationOutput: SimulationOutputDTO?
 )
 
 data class AnalysisVerdict(
         val runtime: Double,
         val verdict: ProblemSubmissionAnalysisStatus,
         @JsonProperty("analysis_output")
-        val analysisOutput: AnalysisOutputDTO,
+        val analysisOutput: AnalysisOutputDTO?,
         @JsonProperty("simulation_output")
         val simulationOutput: SimulationOutputDTO?
 )
@@ -61,7 +59,8 @@ data class CeleryJudgementDTO (
 
 data class SimulationResultDTO(
         val problemId: Long,
-        val simulationVerdict: SimulationVerdict?
+        val simulationVerdict: SimulationVerdict?,
+        val generatedOutput: String?
 )
 
 data class CelerySimulationDTO (
@@ -81,7 +80,9 @@ data class FunctionDTO (
         val error : Double,
         val values : List<Double>,
         val full_expression : String,
+        val full_asymptotic_expression : String,
         val latex_expression : String,
+        val latex_asymptotic_expression : String,
         val chosen : Boolean?
 )
 
